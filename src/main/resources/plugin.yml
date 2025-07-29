@@ -1,0 +1,4 @@
+name: ItemArchiveReimagined
+version: '${project.version}'
+main: net.txsla.itemarchivereimagined.ItemArchiveReimagined
+api-version: '1.21'
