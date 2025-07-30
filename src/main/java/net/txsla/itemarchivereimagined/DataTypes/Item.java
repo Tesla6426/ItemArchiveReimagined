@@ -1,8 +1,13 @@
 package net.txsla.itemarchivereimagined.DataTypes;
 
+import net.txsla.itemarchivereimagined.ItemConverter;
+import net.txsla.itemarchivereimagined.b64;
+import net.txsla.itemarchivereimagined.hash;
+import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class Item {
     public static Server server;
@@ -15,38 +20,63 @@ public class Item {
     private String item_version;
     private ItemStack item_stack;
     private String item_language;
-    private String item_country;
-
-    public Item(ItemStack item) {
-        // this constructor is for loading items from file, populate the other fields with .setX()
-        this.item_stack = item;
-        this.item_name = item.getItemMeta().getDisplayName().substring(0, 255);
-        this.item_size = item.toString().getBytes().length;
-    }
     public Item(ItemStack item, Player submitter) {
         // this constructor is for loading submitted items
         this.item_stack = item;
         this.submitter_name = submitter.getName();
         this.submitter_uuid = submitter.getUniqueId().toString();
-        this.item_name = item.getItemMeta().getDisplayName().substring(0, 255);
+
+        // make sure item name is not too long
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null && meta.hasDisplayName()) {
+            String name = meta.getDisplayName();
+            this.item_name = name.length() > 256 ? name.substring(0, 255) : name;
+        } else {
+            this.item_name = "unnamed_item";
+        }
+
         this.item_size = item.toString().getBytes().length;
         this.item_date = System.currentTimeMillis();
         this.item_language = submitter.locale().getDisplayLanguage();
-        this.item_country = submitter.locale().getDisplayCountry();
-
-        this.item_uuid = "To be made";
+        this.item_version = Bukkit.getMinecraftVersion();
+        this.item_uuid = hash.getUUID(item);
     }
     public Item(ItemStack item, String submitter_name) {
         // load from old file format
+        // this method should not be needed as I plan on making a .ar -> .vault file converter built into this plugin
         this.item_stack = item;
-        this.item_name = item.getItemMeta().getDisplayName().substring(0, 255);
+
+        // make sure item name is not too long
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null && meta.hasDisplayName()) {
+            String name = meta.getDisplayName();
+            this.item_name = name.length() > 256 ? name.substring(0, 255) : name;
+        } else {
+            this.item_name = "unnamed_item";
+        }
+
         this.item_size = item.toString().getBytes().length;
         this.item_date = System.currentTimeMillis();
 
         this.submitter_name = submitter_name;
         this.submitter_uuid = server.getOfflinePlayer(submitter_name).getUniqueId().toString();
+        this.item_version = Bukkit.getMinecraftVersion();
+        this.item_uuid = hash.getUUID(item);
 
-        this.item_uuid = "To be made";
+        this.item_language = null;
+    }
+    public Item(String item_name, String item_uuid, String submitter_name, String submitter_uuid, double item_date, double item_size, String item_version, ItemStack item_stack, String item_language) {
+        // there are no protections for this method
+        // make sure to input only valid data
+        this.item_name = item_name;
+        this.item_uuid = item_uuid;
+        this.submitter_name = submitter_name;
+        this.submitter_uuid = submitter_uuid;
+        this.item_date = item_date;
+        this.item_size = item_size;
+        this.item_version = item_version;
+        this.item_stack = item_stack;
+        this.item_language = item_language;
     }
 
 
@@ -78,36 +108,56 @@ public class Item {
     public String getLanguage() {
         return this.item_language;
     }
-    public String getCountry() {
-        return this.item_country;
-    }
 
 
-    // SET VALUES
-    public void setItemName(String item_name) {
-        // only load first 255 chars of item name
-        this.item_name = item_name.substring(0, 255);
-    }
-    public void setItemUUID(String uuid) {
-        this.item_uuid = uuid;
-    }
-    public void setSubmitterName(String submitter_name) {
-        this.submitter_name = submitter_name;
-    }
-    public void setSubmitterUUID(String UUID) {
-        this.submitter_uuid = UUID;
-    }
-    public void setSubmitDate(double date_time) {
-        this.item_date = date_time;
-    }
-    public void setItemVersion(String version) {
-        this.item_version = version;
-    }
-    public void setItemLanguage(String language) {
-        this.item_language = language;
-    }
-    public void setItemCountry(String country) {
-        this.item_country = country;
-    }
 
+
+
+
+
+    
+    // this serialization will be a bit different,
+    // it will be formatted in order to be more human-readable when the data is viewed
+    // while this will make the code a few microseconds longer to run, it will be very worth it considering ths specific method only needs to be run once or twice per item ever
+    public String serialize() {
+        // make sure display name stays under 32 chars
+        String name = this.item_name;
+        if (name.length() > 32) name = name.substring(0,31);
+
+        // human-readable section, this is discarded upon deserialization, (except for uuid)
+        String out =
+                name.replace("¦", "|") + "¦" +
+                this.item_stack.getType() + "¦" +
+                this.getSubmitterName() + "¦" +
+                this.getUUID() + "¦"
+                ;
+        String data = b64.encode(
+                    b64.encode(this.item_name)+ "¦" +
+                    b64.encode(this.submitter_name) + "¦" +
+                    b64.encode(this.submitter_uuid) + "¦" +
+                    b64.encode(""+this.item_date) + "¦" +
+                    b64.encode(""+this.item_size) + "¦" +
+                    b64.encode(this.item_version) + "¦" +
+                    b64.encode(ItemConverter.toString(this.item_stack)) + "¦" +
+                    b64.encode(item_language)
+        );
+
+
+        return out + data;
+    }
+    public static Item deserialize(String serialized) {
+        String[] out = serialized.split("¦"); // out+data
+        String[] data = b64.decode(out[4]).split("¦"); // data
+        return new Item(
+                b64.decode(data[0]),
+                b64.decode(out[3]),
+                b64.decode(data[1]),
+                b64.decode(data[2]),
+                Double.parseDouble(b64.decode(data[3])),
+                Double.parseDouble(b64.decode(data[4])),
+                b64.decode(data[5]),
+                ItemConverter.toItemStack(b64.decode(data[6])),
+                b64.decode(data[7])
+        );
+    }
 }
