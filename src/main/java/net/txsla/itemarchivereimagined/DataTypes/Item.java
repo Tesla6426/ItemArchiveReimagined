@@ -115,7 +115,7 @@ public class Item {
 
 
 
-    
+
     // this serialization will be a bit different,
     // it will be formatted in order to be more human-readable when the data is viewed
     // while this will make the code a few microseconds longer to run, it will be very worth it considering ths specific method only needs to be run once or twice per item ever

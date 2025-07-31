@@ -17,6 +17,16 @@ public class Page {
         this.vault_populators = vault_populators;
         this.format = format;
     }
+    public String getName() {return this.name;}
+    public int getWidth() {return this.width;}
+    public int getHeight() {return this.height;}
+    public int getVault_populators() {return this.vault_populators;}
+    public String[] getFormat() {return format;};
+    public void setName(String name) {this.name = name;}
+    public void setWidth(int width) {this.width = width;}
+    public void setHeight(int height) {this.height = height;}
+    public void setVault_populators(int vault_populators) {this.vault_populators = vault_populators;}
+    public void setFormat(String[] format) {this.format = format;}
     private int width, height;
     private String name;// name displayed at the top of the page
     private int vault_populators; // used to quickly get the amount of populators on the page to efficiently find the starting index for the next page
