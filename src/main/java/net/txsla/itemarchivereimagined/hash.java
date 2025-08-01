@@ -30,4 +30,8 @@ public class hash {
         // add item name and type, then hash
         return sha256(item.getItemMeta().getDisplayName() + item.getType());
     }
+    public static boolean regex() {
+
+        return false;
+    }
 }

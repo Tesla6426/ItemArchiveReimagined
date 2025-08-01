@@ -3,6 +3,7 @@ package net.txsla.itemarchivereimagined;
 import net.txsla.itemarchivereimagined.DataTypes.Item;
 import net.txsla.itemarchivereimagined.DataTypes.Page;
 import net.txsla.itemarchivereimagined.DataTypes.Placeholder;
+import org.bukkit.inventory.ItemStack;
 
 public class deserialize {
     public static Placeholder placeholder(String serialized) {

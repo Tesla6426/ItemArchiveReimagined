@@ -80,9 +80,12 @@ public class Item {
     }
 
 
+
     // GET VALUE
+
     public String getName() {
-        return this.item_name;
+        if (this.item_name == null) return "unnamed_item";
+        return item_name;
     }
     public String getUUID() {
         return this.item_uuid;

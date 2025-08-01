@@ -20,16 +20,16 @@ import java.util.Objects;
 
 public class Archive {
     // archive internal data
-    private String name;
-    public static YamlDocument ConfigFile; // file for configs
-    private boolean inf_page; // allow infinite pages, last page is cloned indefinitely to populate the next page(s)
-    private boolean allow_submission, review_items; // should the submission page be enabled?
-    private int max_stack_size, max_item_size, min_item_size;
-    private double submit_delay;
-    private List<Page> pages; // page formatting
-    private List<Placeholder> placeholder; // List of all items in the archive
-    private List<String> editors;
-    private List<String> submit_bans;
+    private volatile String name;
+    public volatile static YamlDocument ConfigFile; // file for configs
+    private volatile boolean inf_page; // allow infinite pages, last page is cloned indefinitely to populate the next page(s)
+    private volatile boolean allow_submission, review_items; // should the submission page be enabled?
+    private volatile int max_stack_size, max_item_size, min_item_size;
+    private volatile double submit_delay;
+    private volatile List<Page> pages; // page formatting
+    private volatile List<Placeholder> placeholder; // List of all items in the archive
+    private volatile List<String> editors;
+    private volatile List<String> submit_bans;
 
 
     // code for loading / creating archives
@@ -54,7 +54,7 @@ public class Archive {
     private boolean loadFromConfig() throws IOException {
         // marks the code to be rerun in case of values being missing and filled
         boolean rerun = false;
-        // load vars from config
+        // load vars from config, store null values if missing
         Boolean inf_page_temp = ConfigFile.getBoolean("inf-pages");
         Boolean allow_submission_temp = ConfigFile.getBoolean("allow-submissions");
         Boolean review_items_temp = ConfigFile.getBoolean("review-items");
@@ -65,11 +65,7 @@ public class Archive {
         List<String> editors_temp = ConfigFile.getStringList("editors");
         List<String> submit_bans_temp = ConfigFile.getStringList("submit-bans");
 
-        // dummy value
-        List<String> example = new ArrayList<>();
-        example.add("example");
-
-        // make sure values are not null, load default values if they are
+        // check for null values and repair them if found
         if (inf_page_temp == null) { setInf_pages(false); rerun = true;}
         if (allow_submission_temp == null) { setAllow_submission(false); rerun = true;}
         if (review_items_temp == null) { setReview_items(true); rerun = true;}
@@ -165,6 +161,7 @@ public class Archive {
     public int getMax_stack_size() {return this.max_stack_size;}
     public int getMin_item_size() {return this.min_item_size;}
     public int getMax_item_size() {return this.max_item_size;}
+    public double getSubmit_delay() {return this.submit_delay;}
 
     //set -- add changes to config file
     public void setInf_pages(boolean inf_pages) {
