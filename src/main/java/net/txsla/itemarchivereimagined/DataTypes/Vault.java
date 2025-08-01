@@ -12,6 +12,14 @@ public class Vault {
     public Vault(List<Item> items) {
         this.items = items;
     }
+    public Vault(String name, String archive_name) {
+        // load from vault file in archive folder
+        // archive_name is the name of the folder, name is the name of the vault
+        // if vault does not exist, then create a new vault file in its place
+        // there are 3 default vaults per archive - main, review, and rejected
+
+
+    }
     private List<Item> items;
 
     private Set<String> item_uuids = new HashSet<>(); // allows for much faster checking at the expense of initial loading speed

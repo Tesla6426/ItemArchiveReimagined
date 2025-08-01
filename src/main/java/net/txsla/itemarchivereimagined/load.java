@@ -3,8 +3,9 @@ package net.txsla.itemarchivereimagined;
 import java.io.File;
 import java.nio.file.Path;
 import dev.dejvokep.boostedyaml.YamlDocument;
+import net.txsla.itemarchivereimagined.DataTypes.Archive;
 
-    public class load {
+public class load {
     public static File directory;
 
         // vaults and archives are saved, loaded and stored separately for maximum performance
@@ -37,10 +38,9 @@ import dev.dejvokep.boostedyaml.YamlDocument;
         // get subdirs (archive folders)
         File[] archives = directory.listFiles(File::isDirectory);
         // handle no archives case
-        if (archives == null) {
-            System.out.println("No archives found!");
-            return;
-        }
+        if (archives == null) { System.out.println("No archives found!"); return; }
+
+
         // DEBUG REMOVE LATER
         if (ItemArchiveReimagined.debug) {
             System.out.println("Looking for archives...");
@@ -49,8 +49,18 @@ import dev.dejvokep.boostedyaml.YamlDocument;
             }
         }
 
-        // load archive configs
+        // multi-thread load archive and vaults
+        for (File archive : archives) {
+            new Thread(() -> {
+                // load archive object
+                Storage.archives.put(archive.getName(), new Archive(archive.getName()));
+                // load vaults
+                // review 1st, main 2nd, rejected 3rd
 
+
+
+            }, archive.getName()).start();
+        }
 
 
     }

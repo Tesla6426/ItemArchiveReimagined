@@ -18,9 +18,10 @@ public final class ItemArchiveReimagined extends JavaPlugin {
 
 
         // load file path for Archives
-        directory = new File(this.getDataPath().getRoot() + File.separator + "Archives");
+        directory = new File(this.getDataPath().getRoot() + File.separator + "archives");
         load.directory = directory; // Yes, this is redundant. It will be optimised by compiler later, so it does not matter
 
+        // load archives
 
 
     }

@@ -34,7 +34,7 @@ public class Archive {
 
     // code for loading / creating archives
 
-    public void Archive(String name) {
+    public Archive(String name) {
         this.name = name;
 
         this.pages = new ArrayList<>();
@@ -57,13 +57,13 @@ public class Archive {
         // load vars from config
         Boolean inf_page_temp = ConfigFile.getBoolean("inf-pages");
         Boolean allow_submission_temp = ConfigFile.getBoolean("allow-submissions");
-        Boolean review_items = ConfigFile.getBoolean("review-items");
+        Boolean review_items_temp = ConfigFile.getBoolean("review-items");
         Integer max_stack_size_temp = ConfigFile.getInt("max-stack-size");
         Integer max_item_size_temp = ConfigFile.getInt("max-submission-size");
         Integer min_item_size_temp = ConfigFile.getInt("min-submission-size");
         Double submit_delay_temp = ConfigFile.getDouble("submit-delay");
         List<String> editors_temp = ConfigFile.getStringList("editors");
-        List<String> submit_bans = ConfigFile.getStringList("submit-bans");
+        List<String> submit_bans_temp = ConfigFile.getStringList("submit-bans");
 
         // dummy value
         List<String> example = new ArrayList<>();
@@ -72,13 +72,13 @@ public class Archive {
         // make sure values are not null, load default values if they are
         if (inf_page_temp == null) { setInf_pages(false); rerun = true;}
         if (allow_submission_temp == null) { setAllow_submission(false); rerun = true;}
-        if (review_items == null) { setReview_items(true); rerun = true;}
+        if (review_items_temp == null) { setReview_items(true); rerun = true;}
         if (max_stack_size_temp == null) { setMax_stack_size(1); rerun = true;}
         if (max_item_size_temp == null) { setMax_item_size(1000000); rerun = true;}
         if (min_item_size_temp == null) { setMin_item_size(100); rerun = true;}
         if (submit_delay_temp == null) { setSubmit_delay(10); rerun = true;}
         if (editors_temp == null) { addEditor("_txsla"); rerun = true;}
-        if (submit_bans == null) { addSubmit_ban("banned_player"); rerun = true;}
+        if (submit_bans_temp == null) { addSubmit_ban("banned_player"); rerun = true;}
 
 
         // Get all b64 strings for Pages and Placeholders from config
@@ -126,15 +126,23 @@ public class Archive {
         // move temp vars
         this.inf_page = inf_page_temp;
         this.allow_submission = allow_submission_temp;
+        this.review_items = review_items_temp;
+        this.max_stack_size = max_stack_size_temp;
+        this.max_item_size = max_item_size_temp;
+        this.min_item_size = min_item_size_temp;
+        this.submit_delay = submit_delay_temp;
+        this.editors = editors_temp;
+        this.submit_bans = submit_bans_temp;
 
+        // load complete
         return false;
     }
 
     // code for loading/saving config
     public void loadConfig() {
         try {
-        ConfigFile = YamlDocument.create(new File(ItemArchiveReimagined.directory, this.name + ".conf"),
-                Objects.requireNonNull(getClass().getResourceAsStream("/" + this.name + ".conf")),
+        ConfigFile = YamlDocument.create(new File(ItemArchiveReimagined.directory + File.separator + this.name, this.name + ".conf"),
+                Objects.requireNonNull(getClass().getResourceAsStream("/example/default_archive.conf")),
                 GeneralSettings.DEFAULT,
                 LoaderSettings.builder().setAutoUpdate(true).build(),
                 DumperSettings.DEFAULT,
