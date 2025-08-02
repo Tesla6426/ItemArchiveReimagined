@@ -1,5 +1,6 @@
 package net.txsla.itemarchivereimagined;
 
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -8,22 +9,21 @@ import java.nio.file.Path;
 public final class ItemArchiveReimagined extends JavaPlugin {
 
     // for development  - remove later
-    public static File directory;
+
     public static boolean debug = true;
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
-        saveDefaultConfig();
-
-
-        // load file path for Archives
-        directory = new File(this.getDataPath().getRoot() + File.separator + "archives");
-        load.directory = directory; // Yes, this is redundant. It will be optimised by compiler later, so it does not matter
+        Storage.server = this;
 
         // load archives
+        load.archives();
 
-
+        // register commands
+        getCommand("submit").setExecutor(new net.txsla.itemarchivereimagined.Commands.submit() );
+        getCommand("create").setExecutor(new net.txsla.itemarchivereimagined.Commands.create() );
+        getCommand("raw").setExecutor(new net.txsla.itemarchivereimagined.Commands.raw() );
+        getCommand("loadoldarchive").setExecutor(new net.txsla.itemarchivereimagined.Commands.loadoldarchive() );
     }
 
     @Override

@@ -2,6 +2,7 @@ package net.txsla.itemarchivereimagined.DataTypes;
 
 import net.txsla.itemarchivereimagined.b64;
 import net.txsla.itemarchivereimagined.deserialize;
+import net.txsla.itemarchivereimagined.hash;
 import net.txsla.itemarchivereimagined.load;
 import org.bukkit.inventory.ItemStack;
 
@@ -18,8 +19,8 @@ import static net.txsla.itemarchivereimagined.Storage.saveToFile;
 
 public class Vault {
     // This data type is used to load/retrieve saved items in an archive
-    private List<Item> items; // list of all items
-    private Set<String> item_uuids = new HashSet<>(); // allows for much faster checking at the expense of initial loading speed
+    private List<Item> items;
+    private Set<String> item_uuids = new HashSet<>();
     private List<String> file = new ArrayList<>(); // yes, I am storing the entire vault file in RAM. It should only add the file size of the vault file to ram (~55mb*2 as of 8/1/2025)
     private String name;
     private Path file_location;
@@ -33,6 +34,15 @@ public class Vault {
 
     public boolean checkDuplicate(String uuid) {
         return item_uuids.contains(uuid);
+    }
+    public boolean addItem(Item item) {
+        if (checkDuplicate(item.getUUID())) return false;
+        this.item_uuids.add(item.getUUID());
+        this.items.add(item);
+        return true;
+    }
+    public void addItems() {
+
     }
     public Vault(String name, String archive_name) {
         // load from vault file in archive folder
@@ -59,10 +69,15 @@ public class Vault {
         item_uuids.clear(); this.items = new ArrayList<>();// clear current lists
         Item current_item; // don't make a billion extra objects in mem
         for (String encoded_item : this.file) {
-            current_item = deserialize.item(encoded_item);
-            // add item and UUID to list
-            this.item_uuids.add(current_item.getUUID());
-            this.items.add(current_item);
+            try {
+                // add item and UUID to list
+                current_item = deserialize.item(encoded_item);
+                this.items.add(current_item);
+                this.item_uuids.add(current_item.getUUID());
+            } catch (Exception e) {
+                System.out.println("Failed to deserialize item " + encoded_item + "! ");
+                e.printStackTrace();
+            }
         }
         System.out.println("Vault " + archive_name + "-" + name + " loaded from RAM" );
     }
@@ -72,6 +87,7 @@ public class Vault {
             System.out.println("Vault " + this.archive_name + "-" + this.name + " saved!");
         }catch (Exception e) {
             System.out.println("Unable to save vault " + this.archive_name + "-" + this.name + "!");
+            e.printStackTrace();
         }
     }
     public void saveItemsToRam() {
@@ -156,12 +172,31 @@ public class Vault {
         }
         return items_found;
     }
+    public List<Item> searchFromItemSubmitDate(int date, boolean after, int amount) {
+        List<Item> items_found = new ArrayList<>();
+        double item_date;
+        for (Item item : this.items) {
+            item_date = item.getItemSubmitDate();
+            if (after ? item_date > date : item_date < date) items_found.add(item);
+            if (items_found.size() >= amount) break;
+        }
+        return items_found;
+    }
     // This one can be extremely expensive - only high tier supporters will gain access
     public List<Item> searchFromItemNBT(String regex, int amount) {
         List<Item> items_found = new ArrayList<>();
         Pattern pattern = Pattern.compile(regex);
         for (Item item : this.items) {
-            if (pattern.matcher(item.getItemStack().getItemMeta().getAsComponentString()).find()) items_found.add(item);
+            //if (pattern.matcher(item.getItemStack().getItemMeta().getAsComponentString()).find()) items_found.add(item);
+            if (items_found.size() >= amount) break;
+        }
+        return items_found;
+    }
+    public List<Item> searchFromItemRawData(String regex, int amount) {
+        List<Item> items_found = new ArrayList<>();
+        Pattern pattern = Pattern.compile(regex);
+        for (Item item : this.items) {
+            if (pattern.matcher(item.getItemStack().toString()).find()) items_found.add(item);
             if (items_found.size() >= amount) break;
         }
         return items_found;

@@ -1,4 +1,36 @@
 name: ItemArchiveReimagined
 version: '${project.version}'
 main: net.txsla.itemarchivereimagined.ItemArchiveReimagined
-api-version: '1.21'
+api-version: '1.20'
+
+permissions :
+  archive.public:
+    description: "Allows the average player to interact with the archive"
+    default-permission: true
+    default: true
+
+commands:
+  submit:
+    description: "Submit an item to the archives"
+    usage: "/submit <archive> <gui|hand|hotbar|inventory>"
+    aliases: []
+    permission: archive.public
+    permission-message: "You do not have permission to use this command"
+  create:
+    description: "Create a new Archive"
+    usage: "/create <archive>"
+    aliases: [ ]
+    permission: archive.public
+    permission-message: "You do not have permission to use this command"
+  raw:
+    description: "view a vault raw"
+    usage: "/raw <vault>"
+    aliases: []
+    permission: archive.public
+    permission-message: "You do not have permission to use this command"
+  loadoldarchive:
+    description: "add items from an old archive file"
+    usage: "/loadoldarchive <vault>"
+    aliases: [ ]
+    permission: archive.public
+    permission-message: "You do not have permission to use this command"

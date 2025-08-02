@@ -7,7 +7,7 @@ import net.txsla.itemarchivereimagined.DataTypes.Archive;
 import net.txsla.itemarchivereimagined.DataTypes.Vault;
 
 public class load {
-    public static File directory;
+    public final static File directory = new File(System.getProperty("user.dir") + File.separator + "archives");
     public static void archives() {
         // this should only be run once per server (re)start
         System.out.println("Loading Archives");

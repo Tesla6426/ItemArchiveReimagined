@@ -8,6 +8,7 @@ import dev.dejvokep.boostedyaml.settings.general.GeneralSettings;
 import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 import net.txsla.itemarchivereimagined.ItemArchiveReimagined;
+import net.txsla.itemarchivereimagined.load;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import sun.security.krb5.Config;
@@ -137,8 +138,8 @@ public class Archive {
     // code for loading/saving config
     public void loadConfig() {
         try {
-        ConfigFile = YamlDocument.create(new File(ItemArchiveReimagined.directory + File.separator + this.name, this.name + ".conf"),
-                Objects.requireNonNull(getClass().getResourceAsStream("/example/default_archive.conf")),
+        ConfigFile = YamlDocument.create(new File(load.directory + File.separator, this.name + ".conf"),
+                null,
                 GeneralSettings.DEFAULT,
                 LoaderSettings.builder().setAutoUpdate(true).build(),
                 DumperSettings.DEFAULT,
@@ -147,7 +148,8 @@ public class Archive {
         ConfigFile.update();
         ConfigFile.save();
         } catch (Exception e) {
-            System.out.println("Error loading " + this.name + " archive config file!");
+            System.out.println("Error loading " + this.name + " archive config file!" );
+            e.printStackTrace();
         }
     }
 
