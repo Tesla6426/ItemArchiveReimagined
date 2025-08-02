@@ -29,7 +29,7 @@ public class ItemConverter {
         }
 
         if (restoredItem.getType().toString().equals(Material.AIR.toString())) {
-            System.out.println("serialized to AIR\n" + serialized);
+            //System.out.println("serialized to AIR\n" + serialized);
         }
 
         return restoredItem;

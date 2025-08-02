@@ -75,8 +75,8 @@ public class Vault {
                 this.items.add(current_item);
                 this.item_uuids.add(current_item.getUUID());
             } catch (Exception e) {
-                System.out.println("Failed to deserialize item " + encoded_item + "! ");
-                e.printStackTrace();
+                //System.out.println("Failed to deserialize item " + encoded_item + "! ");
+                //e.printStackTrace();
             }
         }
         System.out.println("Vault " + archive_name + "-" + name + " loaded from RAM" );

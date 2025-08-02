@@ -66,7 +66,7 @@ public class Item {
         if (this.item_stack.getItemMeta() != null) {
             this.item_uuid = hash.getUUID(this.item_stack);
         } else {
-            System.out.println("No Metadata on item " + item.toString() + "?");
+            //System.out.println("No Metadata on item " + item.toString() + "?");
         }
 
         this.item_language = "null";
