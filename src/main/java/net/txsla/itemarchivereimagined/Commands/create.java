@@ -21,23 +21,17 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class create implements CommandExecutor, TabExecutor {
-    public static List<String> timeIndex;
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args)
     {
         if (args.length < 1) return false;
 
+        if (Storage.archives.containsKey(args[0])) sender.sendMessage("§aArchive " + args[0] + " already exists, reloading instead.");
+            else sender.sendMessage("§aArchive " + args[0] + " created!");
 
-        // add some input validation later
-
-        Player p = (Player) sender;
-
-        // load a new archive;
         load.archive(args[0]);
-        sender.sendMessage("Archive " + args[0] + " created");
-
         return true;
-    }
+   }
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         return new ArrayList<>();

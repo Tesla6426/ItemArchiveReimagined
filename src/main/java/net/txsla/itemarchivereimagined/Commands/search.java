@@ -21,7 +21,7 @@ public class search implements CommandExecutor, TabExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args)
     {
-
+        if (!(sender instanceof Player)) { sender.sendMessage("This command can only be run by a player!"); return true; }
         Player p = (Player) sender;
         // use the damn command correctly
         if (args.length < 2) return false;

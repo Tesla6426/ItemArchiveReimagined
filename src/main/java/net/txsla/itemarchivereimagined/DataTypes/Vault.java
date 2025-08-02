@@ -1,9 +1,6 @@
 package net.txsla.itemarchivereimagined.DataTypes;
 
-import net.txsla.itemarchivereimagined.b64;
-import net.txsla.itemarchivereimagined.deserialize;
-import net.txsla.itemarchivereimagined.hash;
-import net.txsla.itemarchivereimagined.load;
+import net.txsla.itemarchivereimagined.*;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.*;
@@ -26,7 +23,10 @@ public class Vault {
     private Path file_location;
     private String archive_name;
     public List<Item> getItems() {return items;}
-    public Item getItem(int index) {return items.get(index);}
+    public Item getItem(int index) {
+        if (index > this.getSize()-1) return Storage.air;
+        return items.get(index);
+    }
     public int getSize() {return item_uuids.size();}
 
 
@@ -40,9 +40,6 @@ public class Vault {
         this.item_uuids.add(item.getUUID());
         this.items.add(item);
         return true;
-    }
-    public void addItems() {
-
     }
     public Vault(String name, String archive_name) {
         // load from vault file in archive folder

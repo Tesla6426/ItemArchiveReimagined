@@ -22,19 +22,18 @@ public class raw implements CommandExecutor, TabExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args)
     {
+        if (!(sender instanceof Player)) { sender.sendMessage("This command can only be run by a player!"); return true; }
         Player p = (Player) sender;
         // use the damn command correctly
         if (args.length < 1) return false;
 
         // make sure the vault exists
-        if (Storage.vaults.containsKey(args[0])) {
-            sender.sendMessage("§cArchive " + args[0] + " does not exist"); //return true;
+        if (!Storage.vaults.containsKey(args[0])) {
+            sender.sendMessage("§cArchive " + args[0] + " does not exist"); return true;
         }
 
         sender.sendMessage("§aThere are " + Storage.vaults.get(args[0]).getSize() + " items in vault " + args[0]);
-
         Inventory chestInventory = Bukkit.createInventory(null, 54, args[0]);
-
         List<Item> items = Storage.vaults.get(args[0]).getItems();
 
         // Populate inventory slots with items (up to inventory size)

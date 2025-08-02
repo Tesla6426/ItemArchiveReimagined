@@ -40,3 +40,9 @@ commands:
     aliases: [ ]
     permission: archive.public
     permission-message: "You do not have permission to use this command"
+  open:
+    description: "Open an archive"
+    usage: "/open <archive> <int page>"
+    aliases: [ ]
+    permission: archive.public
+    permission-message: "You do not have permission to use this command"

@@ -21,8 +21,7 @@ public class deserialize {
                 b64.decode(data[0]),
                 Integer.parseInt(b64.decode(data[1])),
                 Integer.parseInt(b64.decode(data[2])),
-                Integer.parseInt(b64.decode(data[3])),
-                b64.decode(data[4]).split("¦")
+                b64.decode(data[3]).split("¦")
         );
     }
     public static Item item(String serialized) {
