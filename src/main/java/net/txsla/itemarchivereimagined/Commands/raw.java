@@ -34,6 +34,7 @@ public class raw implements CommandExecutor, TabExecutor {
         sender.sendMessage("§aThere are " + Storage.vaults.get(args[0]).getSize() + " items in vault " + args[0]);
 
         Inventory chestInventory = Bukkit.createInventory(null, 54, args[0]);
+
         List<Item> items = Storage.vaults.get(args[0]).getItems();
 
         // Populate inventory slots with items (up to inventory size)
@@ -45,7 +46,15 @@ public class raw implements CommandExecutor, TabExecutor {
     }
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String str, @NotNull String[] args) {
-        if (Storage.vaults == null) return new ArrayList<>();
-        return new ArrayList<>(Storage.vaults.keySet());
+        List<String> list = new ArrayList<>();
+        switch (args.length) {
+            case 1:
+                return new ArrayList<>(Storage.vaults.keySet());
+            case 2:
+                list.add("0");
+                list.add("" +Storage.vaults.get(args[0]).getSize());
+                return list;
+        }
+        return null;
     }
 }

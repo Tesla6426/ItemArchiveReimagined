@@ -34,3 +34,9 @@ commands:
     aliases: [ ]
     permission: archive.public
     permission-message: "You do not have permission to use this command"
+  search:
+    description: "Search a vault"
+    usage: "/search <vault> <parameter> <args>"
+    aliases: [ ]
+    permission: archive.public
+    permission-message: "You do not have permission to use this command"

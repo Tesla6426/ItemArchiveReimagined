@@ -23,6 +23,7 @@ public final class ItemArchiveReimagined extends JavaPlugin {
         getCommand("submit").setExecutor(new net.txsla.itemarchivereimagined.Commands.submit() );
         getCommand("create").setExecutor(new net.txsla.itemarchivereimagined.Commands.create() );
         getCommand("raw").setExecutor(new net.txsla.itemarchivereimagined.Commands.raw() );
+        getCommand("search").setExecutor(new net.txsla.itemarchivereimagined.Commands.search() );
         getCommand("loadoldarchive").setExecutor(new net.txsla.itemarchivereimagined.Commands.loadoldarchive() );
     }
 
