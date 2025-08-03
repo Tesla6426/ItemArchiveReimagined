@@ -38,7 +38,11 @@ public final class ItemArchiveReimagined extends JavaPlugin {
         getCommand("raw").setExecutor(new net.txsla.itemarchivereimagined.Commands.raw() );
         getCommand("search").setExecutor(new net.txsla.itemarchivereimagined.Commands.search() );
         getCommand("open").setExecutor(new net.txsla.itemarchivereimagined.Commands.open() );
+
+        // dev
         getCommand("loadoldarchive").setExecutor(new net.txsla.itemarchivereimagined.Commands.loadoldarchive() );
+        getCommand("openDemoInventory").setExecutor(new net.txsla.itemarchivereimagined.Commands.openDemoInventory() );
+
 
         getServer().getPluginManager().registerEvents(new Listener(), this);
     }

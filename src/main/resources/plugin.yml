@@ -46,3 +46,9 @@ commands:
     aliases: [ ]
     permission: archive.public
     permission-message: "You do not have permission to use this command"
+  openDemoInventory:
+    description: "Opens a demo inventory"
+    usage: "/openDemoInventory <vault> <int inventory> <bool>"
+    aliases: [ ]
+    permission: archive.public
+    permission-message: "You do not have permission to use this command"

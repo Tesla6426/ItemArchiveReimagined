@@ -12,10 +12,11 @@ public class Listener implements org.bukkit.event.Listener {
     public void OnClick(InventoryClickEvent event) {
         // if player is not in a ItemArchive gui, then do not process input
         if (!Storage.gui_tracker.containsKey( event.getWhoClicked().getName() )) return;
-
+        Player p = (Player) event.getWhoClicked();
             /*
             * There are a few actions we need to look out for
             * Placeholder Action Values
+            *   -x= some fun effects
             *   0 = nothing
             *   1 = static
             *   2 = next_page
@@ -23,35 +24,29 @@ public class Listener implements org.bukkit.event.Listener {
             *   4 = execute_command
             *   5 = submission_populator
             *   6 = submit (or pg.0)
+            *   7 = set item to cursor
+            *   8 = open sign
+            *   9 = open book
             * */
 
         // format: archive - gui - <int info>
-        String[] data = Storage.gui_tracker.get(event.getWhoClicked().getName()).split("-");
+        String[] data = Storage.gui_tracker.get(p.getName()).split("-");
         String archive_name = data[0];
         String gui = data[1];
         int info = Integer.parseInt(data[2]);
         int action = 0;
+
         // get Placeholder from archive
         Archive archive = Storage.archives.get(archive_name);
+        String action_data = archive.getPlaceholder( archive.getPage(info).getPlaceholderIdFromSlot(event.getSlot()) ).getAction_data();
+        action = archive.getPlaceholder( archive.getPage(info).getPlaceholderIdFromSlot(event.getSlot()) ).getAction();
 
         // get action
         switch (gui) {
+            // these two are for when players open the archives
             case "open":
             case "submit":
-                action = archive.getPlaceholder( archive.getPage(info).getPlaceholderIdFromSlot(event.getSlot()) ).getAction(); // action will be 0 if not found
-
-                // next page actions for open and submit only
-                if (action == 2) {
-                    event.setCancelled(true);
-                    ((Player) event.getWhoClicked()).performCommand("open " + archive_name + " " + (info+1));
-                    return;
-                }
-                if (action == 3) {
-                    event.setCancelled(true);
-                    ((Player) event.getWhoClicked()).performCommand("open " + archive_name + " " + (info-1));
-                    return;
-                }
-
+                event.setCancelled(archiveClickEffect(p, action, action_data, archive_name, info));
                 break;
             case "edit":
                 /* this gui is for editing Page objects
@@ -70,6 +65,41 @@ public class Listener implements org.bukkit.event.Listener {
         if (action == 1) {event.setCancelled(true); return;}
 
 
+    }
+    public static boolean archiveClickEffect(Player p, int action, String action_data, String archive_name, int info) {
+        switch (action) {
+            case -4:
+                p.showWinScreen();
+                return true;
+            case -3:
+                p.showDemoScreen();
+                return true;
+            case -2:
+                p.showElderGuardian();
+                return true;
+            case -1:
+                p.closeInventory();
+                return true;
+            case 2:
+                p.performCommand("open " + archive_name + " " + (info+1));
+                return true;
+            case 3:
+                p.performCommand("open " + archive_name + " " + (info-1));
+                return true;
+            case 4:
+                p.performCommand(action_data);
+                return true;
+            case 7:
+                p.setItemOnCursor(ItemConverter.toItemStack(action_data));
+                return true;
+            case 8:
+                //p.openSign(); write serializer
+                return true;
+            case 9:
+                //p.openBook(); write serializer
+                return true;
+        }
+        return false;
     }
     @EventHandler
     public void OnClose(InventoryCloseEvent event) {
