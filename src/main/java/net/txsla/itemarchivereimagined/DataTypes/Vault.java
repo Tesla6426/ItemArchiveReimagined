@@ -24,14 +24,10 @@ public class Vault {
     private String archive_name;
     public List<Item> getItems() {return items;}
     public Item getItem(int index) {
-        if (index > this.getSize()-1) return Storage.air;
+        if ((index > this.getSize()-1) || (index < 0)) return Storage.air;
         return items.get(index);
     }
     public int getSize() {return item_uuids.size();}
-
-
-
-
     public boolean checkDuplicate(String uuid) {
         return item_uuids.contains(uuid);
     }
@@ -184,7 +180,7 @@ public class Vault {
         List<Item> items_found = new ArrayList<>();
         Pattern pattern = Pattern.compile(regex);
         for (Item item : this.items) {
-            //if (pattern.matcher(item.getItemStack().getItemMeta().getAsComponentString()).find()) items_found.add(item);
+            //if (pattern.matcher(item.getItemStack().getItemMeta().getAsComponentString()).find()) items_found.add(item); // 1.21.4
             if (items_found.size() >= amount) break;
         }
         return items_found;

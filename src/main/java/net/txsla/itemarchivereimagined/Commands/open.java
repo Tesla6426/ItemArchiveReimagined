@@ -23,10 +23,15 @@ public class open implements CommandExecutor, TabExecutor {
         // validate user input
         if (!Storage.archives.containsKey(args[0])) {sender.sendMessage("§aArchive " + args[0] + " does not exist!"); return true;}
         int number = 1;
-        try {
-            number = Integer.parseInt(args[1]);
-            if (number < 1) {sender.sendMessage("§aPage is reserved."); return true;}
-        }catch (Exception e) { sender.sendMessage("§a" + args[1] + " is not a valid number!"); return true;}
+
+        if (args.length > 1) {
+            try {
+                number = Integer.parseInt(args[1]);
+                if (number < 1) { sender.sendMessage("§aPage is reserved."); return true; }
+            } catch (Exception e) {
+                sender.sendMessage("§a" + args[1] + " is not a valid number!"); return true;
+            }
+        }
 
         // get archive
         Archive archive = Storage.archives.get(args[0]);

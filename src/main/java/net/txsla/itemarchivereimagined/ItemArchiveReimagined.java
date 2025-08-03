@@ -30,7 +30,7 @@ public final class ItemArchiveReimagined extends JavaPlugin {
         ItemStack glass = new ItemStack(Material.RED_STAINED_GLASS_PANE, 1);
         ItemMeta meta = glass.getItemMeta(); meta.setDisplayName(ChatColor.RED + "Error: Item not found!"); glass.setItemMeta(meta);
         Storage.red_glass = new Item(glass, "herobrine");
-        Storage.invalid_placeholder = new Placeholder("invalid", 1, "none", Storage.red_glass.getItemStack());
+        Storage.invalid_placeholder = new Placeholder("invalid", 0, "none", Storage.red_glass.getItemStack());
 
         // register commands
         getCommand("submit").setExecutor(new net.txsla.itemarchivereimagined.Commands.submit() );
@@ -39,6 +39,8 @@ public final class ItemArchiveReimagined extends JavaPlugin {
         getCommand("search").setExecutor(new net.txsla.itemarchivereimagined.Commands.search() );
         getCommand("open").setExecutor(new net.txsla.itemarchivereimagined.Commands.open() );
         getCommand("loadoldarchive").setExecutor(new net.txsla.itemarchivereimagined.Commands.loadoldarchive() );
+
+        getServer().getPluginManager().registerEvents(new Listener(), this);
     }
 
     @Override

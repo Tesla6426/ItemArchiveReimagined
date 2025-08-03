@@ -18,7 +18,7 @@ public class openArchive {
         // this method assumes valid input, validate user input at command
 
         // add player to tracker
-        Storage.gui_tracker.put(p.getName(), archive_name + "-open");
+        Storage.gui_tracker.put(p.getName(), archive_name + "-open-" + number);
 
         // get archive and page
         Archive archive = Storage.archives.get(archive_name);
@@ -28,9 +28,13 @@ public class openArchive {
         int vaultIndex = 0;
         for (int i = 1; i < number - 1; i++) vaultIndex += archive.getPagePopulators(i);
 
+        Inventory inventory;
         // process placeholders and add them to inventory
-        Inventory inventory = Bukkit.createInventory(null, page.getSize(), page.getName());
+        if (page.getSize() < 7) {
+            inventory = Bukkit.createInventory(null, page.getSize() * 9, page.getName());
+        }
         String[] format = page.getFormat();
+
 
         // DEBUG REMOVE LATER
         System.out.println(Arrays.toString(format));
@@ -38,6 +42,7 @@ public class openArchive {
 
         int slot = 0;
         for (String placeholder : format) {
+            if (inventory.getSize() < slot) break; // terminate if loop tries to add too many items
             switch (placeholder) {
                 case "air":
                     // air
@@ -57,5 +62,7 @@ public class openArchive {
         }
 
         p.openInventory(inventory);
+        // re-add player to tracker in case of lag de-sync
+        Storage.gui_tracker.put(p.getName(), archive_name + "-open-" + number);
     }
 }

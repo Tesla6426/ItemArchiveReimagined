@@ -7,10 +7,7 @@ import dev.dejvokep.boostedyaml.settings.dumper.DumperSettings;
 import dev.dejvokep.boostedyaml.settings.general.GeneralSettings;
 import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
-import net.txsla.itemarchivereimagined.ItemArchiveReimagined;
-import net.txsla.itemarchivereimagined.Storage;
-import net.txsla.itemarchivereimagined.deserialize;
-import net.txsla.itemarchivereimagined.load;
+import net.txsla.itemarchivereimagined.*;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -184,10 +181,15 @@ public class Archive {
         return false;
     }
     public List<Placeholder> getPlaceholders() { return this.placeholder; }
+    public Placeholder getPlaceholderFromUUID(String uuid) {
+        // search for placeholder by item uuid
+        for (Placeholder p : this.placeholder) if (hash.getUUID(p.getItem()).equals(uuid) ) return p;
+        return Storage.invalid_placeholder;
+    }
     public Placeholder getPlaceholder(String id) {
         // search for placeholder by id
         for (Placeholder p : this.placeholder) if (p.getId().equals(id) ) return p;
-        return Storage.invalid_placeholder; // return null if placeholder is not found
+        return Storage.invalid_placeholder;
     }
     public ItemStack getPlaceholderItem(String id) {
         // search for placeholder by id

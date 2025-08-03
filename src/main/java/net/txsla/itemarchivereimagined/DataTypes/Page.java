@@ -1,6 +1,7 @@
 package net.txsla.itemarchivereimagined.DataTypes;
 
 import net.txsla.itemarchivereimagined.b64;
+import org.bukkit.event.inventory.InventoryType;
 
 public class Page {
     public Page(String name) {
@@ -15,6 +16,10 @@ public class Page {
         this.vault_populators = vault_populators;
         this.format = format;
     }
+    public String getPlaceholderIdFromSlot(int slot) {
+        if (slot > format.length-1) return "air";
+        return format[slot];
+    }
     public String getName() {return this.name;}
     public int getSize() {return this.size;}
     public int getVault_populators() {return this.vault_populators;}
@@ -23,7 +28,7 @@ public class Page {
     public void setSize(int size) {this.size = size;}
     public void setVault_populators(int vault_populators) {this.vault_populators = vault_populators;}
     public void setFormat(String[] format) {this.format = format;}
-    private int size;
+    private int size; // gets multiplied by nine, max number is 6, anything higher and a custom gui is used
     private String name;// name displayed at the top of the page
     private int vault_populators; // used to quickly get the amount of populators on the page to efficiently find the starting index for the next page
     // format is an array of placeholder IDs used to properly load an archive
