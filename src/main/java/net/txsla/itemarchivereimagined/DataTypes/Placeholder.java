@@ -50,7 +50,7 @@ public class Placeholder {
     public String serialize() {
         return b64.encode(
                 b64.encode(this.id) + "¦" +
-                    b64.encode("" + this.action) + "¦" +
+                    b64.encode(""+this.action) + "¦" +
                     b64.encode(this.action_data) + "¦" +
                     b64.encode(ItemConverter.toString(this.item))
                 );

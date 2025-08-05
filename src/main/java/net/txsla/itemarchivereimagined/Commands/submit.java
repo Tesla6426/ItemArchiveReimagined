@@ -1,88 +1,41 @@
 package net.txsla.itemarchivereimagined.Commands;
 
-import net.txsla.itemarchivereimagined.DataTypes.Item;
-import net.txsla.itemarchivereimagined.DataTypes.Vault;
+import net.txsla.itemarchivereimagined.DataTypes.Archive;
 import net.txsla.itemarchivereimagined.Storage;
-import org.bukkit.Material;
+import net.txsla.itemarchivereimagined.load;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class submit implements CommandExecutor, TabExecutor {
-    public static List<String> timeIndex;
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args)
-    {
-        // This command currently adds items to the vault, make sure to add the items to the archives instead later
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
+        if (args.length < 1) return false;
         if (!(sender instanceof Player)) { sender.sendMessage("This command can only be run by a player!"); return true; }
-        if (args.length < 2) return false;
 
-        List<ItemStack> items = new ArrayList<>();
         Player p = (Player) sender;
 
-        // get items from player
-        switch (args[1]) {
-            case "hand":
-                items.add(p.getInventory().getItemInMainHand()); // bypasses all checks for now
-                break;
-            case "hotbar":
-                items =
-                        IntStream.range(0, 9).mapToObj(i -> p.getInventory().getItem(i))
-                                .filter(item -> (item != null) && (item.getType() != Material.AIR))
-                                .collect(Collectors.toList());
-                break;
-            case "inventory":
-                for (ItemStack item : p.getInventory()) if (item != null && item.getType() != Material.AIR) items.add(item);
-                break;
-            default:
-            case "gui":
-                // Hand control over to gui
-                return true;
-        }
-        int items_added = 0;
-        // get vault
-        Vault vault = Storage.vaults.get(args[0]);
-        for (ItemStack item : items) {
-            if (vault.addItem(new Item(item, p))) {
-                sender.sendMessage("Item " + item.getItemMeta().getDisplayName() + " added to vault");
-                items_added++;
-            }
-            else sender.sendMessage("Item " + item.getItemMeta().getDisplayName() + " rejected from vault. isDuplicate?");
-        }
+        if (!Storage.archives.containsKey(args[0])) {sender.sendMessage("§aArchive " + args[0] + " does not exist!"); return true;}
+        Archive archive = Storage.archives.get(args[0]);
 
-        // save vault
-        vault.saveItemsToRam();
-        vault.saveRamToFile();
+        if (!archive.isAllow_submission()) {p.sendMessage("Submissions are not enabled for this archive!"); return true;}
 
-        sender.sendMessage(items_added + " items added to vault " + args[0]);
+
+        // hand over control to gui
+        net.txsla.itemarchivereimagined.Gui.submitArchive.openMenu(p, args[0]);
 
         return true;
     }
+
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
-        List<String> list = new ArrayList<>();
-        switch (args.length) {
-            case 2:
-                list.add("hand");
-                list.add("hotbar");
-                list.add("gui");
-                list.add("inventory");
-                break;
-            default:
-                list = new ArrayList<>(Storage.vaults.keySet());
-                break;
-        }
-        return list;
+        return new ArrayList<>(Storage.archives.keySet());
     }
 }

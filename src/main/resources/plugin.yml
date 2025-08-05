@@ -8,31 +8,45 @@ permissions :
     description: "Allows the average player to interact with the archive"
     default-permission: true
     default: true
+  archive.tester:
+    description: "Allows the average player to interact with the archive"
+    default-permission: true
+    default: true
+  archive.editor:
+    description: "Allows the average player to interact with the archive"
+    default-permission: true
+    default: true
 
 commands:
   submit:
     description: "Submit an item to the archives"
+    usage: "/submit <archive>"
+    aliases: [ ]
+    permission: archive.public
+    permission-message: "You do not have permission to use this command"
+  submitRaw:
+    description: "Submit an item to the archives"
     usage: "/submit <archive> <gui|hand|hotbar|inventory>"
     aliases: []
-    permission: archive.public
+    permission: archive.editor
     permission-message: "You do not have permission to use this command"
   create:
     description: "Create a new Archive"
     usage: "/create <archive>"
     aliases: [ ]
-    permission: archive.public
+    permission: archive.editor
     permission-message: "You do not have permission to use this command"
   raw:
     description: "view a vault raw"
     usage: "/raw <vault>"
     aliases: []
-    permission: archive.public
+    permission: archive.tester
     permission-message: "You do not have permission to use this command"
   loadoldarchive:
     description: "add items from an old archive file"
     usage: "/loadoldarchive <vault>"
     aliases: [ ]
-    permission: archive.public
+    permission: archive.editor
     permission-message: "You do not have permission to use this command"
   search:
     description: "Search a vault"
@@ -50,5 +64,5 @@ commands:
     description: "Opens a demo inventory"
     usage: "/openDemoInventory <vault> <int inventory> <bool>"
     aliases: [ ]
-    permission: archive.public
+    permission: archive.tester
     permission-message: "You do not have permission to use this command"

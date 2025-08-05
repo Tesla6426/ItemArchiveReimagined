@@ -27,9 +27,10 @@ public class Vault {
         if ((index > this.getSize()-1) || (index < 0)) return Storage.air;
         return items.get(index);
     }
-    public int getSize() {return item_uuids.size();}
+    public String getName() {return this.archive_name + "-" + this.name;}
+    public int getSize() {return this.item_uuids.size();}
     public boolean checkDuplicate(String uuid) {
-        return item_uuids.contains(uuid);
+        return this.item_uuids.contains(uuid);
     }
     public boolean addItem(Item item) {
         if (checkDuplicate(item.getUUID())) return false;

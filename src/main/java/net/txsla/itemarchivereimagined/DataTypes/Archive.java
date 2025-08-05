@@ -9,6 +9,7 @@ import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 import net.txsla.itemarchivereimagined.*;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import sun.security.krb5.Config;
@@ -35,6 +36,31 @@ public class Archive {
         loadConfigDefaults();
         loadPagesAndPlaceHolders();
 
+    }
+    public void submit_items(List<ItemStack> items, Player p) {
+        // make sure no items get through when they aren't supposed to
+        if (!this.isAllow_submission()) return;
+        if (this.getSubmissionBans().contains(p.getName())) return;
+
+        Vault vault;
+        // check if item should be sent to review vault or main vault
+        if (this.getReview_items()) vault = Storage.vaults.get(this.name + "-review");
+        else vault = Storage.vaults.get(this.name + "-main");
+
+        int items_added = 0;
+        for (ItemStack item : items) {
+            if (item.getAmount() > this.getMax_stack_size()) item.setAmount(this.getMax_stack_size()); // enforce max stack size
+            if (vault.addItem(new Item(item, p))) {
+                p.sendMessage("Item " + item.getItemMeta().getDisplayName() + " added to vault");
+                items_added++;
+            }
+            else p.sendMessage("Item " + item.getItemMeta().getDisplayName() + " rejected from vault. isDuplicate?");
+        }
+
+        vault.saveItemsToRam();
+        vault.saveRamToFile();
+
+        p.sendMessage(items_added + "/" + items.size() + " items added to Archive " + this.name);
     }
     private void loadPagesAndPlaceHolders() {
         // Get all b64 strings for Pages and Placeholders from config
@@ -71,16 +97,16 @@ public class Archive {
         if (!this.ConfigFile.contains("submit-bans")) { addSubmit_ban("banned_player"); changed = true;}
         if (!this.ConfigFile.contains("placeholders") || ConfigFile.getSection("placeholders") == null) {
             ConfigFile.set("placeholders.example1", new Placeholder("example1").serialize());
-            ConfigFile.set("placeholders.example2", new Placeholder("example2", 1, "none", new ItemStack(Material.RED_CONCRETE, 1)).serialize());
+            ConfigFile.set("placeholders.example2", new Placeholder("example2", 6, "none", new ItemStack(Material.RED_CONCRETE, 1)).serialize());
             changed = true;
         }
         if (!ConfigFile.contains("gui") || ConfigFile.getSection("gui") == null) {
-            ConfigFile.set("gui.0", new Page("Submit.Page.Default", 9, 27,new String[] {
+            ConfigFile.set("gui.0", new Page("Submit.Page.Default", 9, 3,new String[] {
                     "air", "air", "air", "air", "air", "air", "air", "air", "air",
                     "vault", "vault", "vault", "vault", "vault", "vault", "vault", "vault", "vault",
                     "air", "air", "air", "example1", "air", "example2", "air", "air", "air"
             }).serialize());
-            ConfigFile.set("gui.1", new Page("Open.Page.Default", 9, 27,new String[] {
+            ConfigFile.set("gui.1", new Page("Open.Page.Default", 9, 3,new String[] {
                     "air", "air", "air", "air", "air", "air", "air", "air", "air",
                     "vault", "vault", "vault", "vault", "vault", "vault", "vault", "vault", "vault",
                     "air", "air", "air", "example1", "air", "example2", "air", "air", "air"
@@ -117,6 +143,7 @@ public class Archive {
     public int getMin_item_size() {return ConfigFile.getInt("max-submission-size");}
     public int getMax_item_size() {return ConfigFile.getInt("min-submission-size");}
     public double getSubmit_delay() {return ConfigFile.getDouble("submit-delay");}
+    public boolean getReview_items() { return ConfigFile.getBoolean("review-items"); }
 
     //set -- add changes to config file
     public void setInf_pages(boolean inf_pages) {ConfigFile.set("inf-pages", inf_pages);}
@@ -147,6 +174,9 @@ public class Archive {
     public int getPagePopulators(int page) {
         if (page < countPages()) return this.pages.get(page).getVault_populators();
         return this.pages.get(countPages()-1).getVault_populators();
+    }
+    public List<String> getSubmissionBans() {
+        return ConfigFile.getStringList("submit-bans");
     }
     public int countPages() {return this.pages.size();}
     public boolean setPage(int index, Page page) {

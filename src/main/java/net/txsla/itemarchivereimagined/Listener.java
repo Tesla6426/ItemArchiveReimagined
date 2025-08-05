@@ -1,15 +1,26 @@
 package net.txsla.itemarchivereimagined;
 
 import net.txsla.itemarchivereimagined.DataTypes.Archive;
+import net.txsla.itemarchivereimagined.DataTypes.Page;
+import net.txsla.itemarchivereimagined.DataTypes.Placeholder;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 public class Listener implements org.bukkit.event.Listener {
     @EventHandler
     public void OnClick(InventoryClickEvent event) {
+        // ignore completely if item is null
+        if (event.getCurrentItem() == null) return;
+
         // if player is not in a ItemArchive gui, then do not process input
         if (!Storage.gui_tracker.containsKey( event.getWhoClicked().getName() )) return;
         Player p = (Player) event.getWhoClicked();
@@ -22,7 +33,7 @@ public class Listener implements org.bukkit.event.Listener {
             *   2 = next_page
             *   3 = prev_page
             *   4 = execute_command
-            *   5 = submission_populator
+            *   5 = submission_populator, mostly unused
             *   6 = submit (or pg.0)
             *   7 = set item to cursor
             *   8 = open sign
@@ -30,23 +41,50 @@ public class Listener implements org.bukkit.event.Listener {
             * */
 
         // format: archive - gui - <int info>
-        String[] data = Storage.gui_tracker.get(p.getName()).split("-");
+        String[] data = Storage.gui_tracker.get(p.getName()).split("¦");
         String archive_name = data[0];
         String gui = data[1];
-        int info = Integer.parseInt(data[2]);
+        String info = data[2];
+        int page = Integer.parseInt(data[3]);
         int action = 0;
 
         // get Placeholder from archive
         Archive archive = Storage.archives.get(archive_name);
-        String action_data = archive.getPlaceholder( archive.getPage(info).getPlaceholderIdFromSlot(event.getSlot()) ).getAction_data();
-        action = archive.getPlaceholder( archive.getPage(info).getPlaceholderIdFromSlot(event.getSlot()) ).getAction();
+        Placeholder placeholder = archive.getPlaceholderFromUUID( hash.getUUID(event.getCurrentItem()) ); // get item via UUID
+        String action_data = placeholder.getAction_data();
+        action = placeholder.getAction();
 
         // get action
         switch (gui) {
             // these two are for when players open the archives
-            case "open":
             case "submit":
-                event.setCancelled(archiveClickEffect(p, action, action_data, archive_name, info));
+                if (action == 6) {
+                    event.setCancelled(true);
+
+                    // ignore submit banned players
+                    if (archive.getSubmissionBans().contains(p.getName())) { p.closeInventory(); p.sendMessage("Items Submitted!"); return;}
+
+                    // check to see if player has a submit timer
+
+
+                    // cycle through all slots and add item to array if it is in a submission slot
+                    String[] format = archive.getPage(0).getFormat();
+                    List<ItemStack> items = new ArrayList<>(); ItemStack item;
+                    for (int i = 0; i < format.length; i++) {
+                        if (format[i].equals("vault")) {
+                            item = p.getOpenInventory().getItem(i);
+                            if (item == null) continue;
+                            items.add(item);
+                        }
+                    }
+
+                    // submit items
+                    p.closeInventory();
+                    archive.submit_items(items, p);
+                    return;
+                }
+            case "open":
+                event.setCancelled(archiveClickEffect(p, action, action_data, archive_name, page));
                 break;
             case "edit":
                 /* this gui is for editing Page objects
@@ -66,7 +104,7 @@ public class Listener implements org.bukkit.event.Listener {
 
 
     }
-    public static boolean archiveClickEffect(Player p, int action, String action_data, String archive_name, int info) {
+    public static boolean archiveClickEffect(Player p, int action, String action_data, String archive_name, int page) {
         switch (action) {
             case -4:
                 p.showWinScreen();
@@ -81,13 +119,17 @@ public class Listener implements org.bukkit.event.Listener {
                 p.closeInventory();
                 return true;
             case 2:
-                p.performCommand("open " + archive_name + " " + (info+1));
+                p.performCommand("open " + archive_name + " " + (page+1));
                 return true;
             case 3:
-                p.performCommand("open " + archive_name + " " + (info-1));
+                p.performCommand("open " + archive_name + " " + (page-1));
                 return true;
             case 4:
                 p.performCommand(action_data);
+                return true;
+            case 6:
+                // go to submit page
+                p.performCommand("submit " + archive_name);
                 return true;
             case 7:
                 p.setItemOnCursor(ItemConverter.toItemStack(action_data));
