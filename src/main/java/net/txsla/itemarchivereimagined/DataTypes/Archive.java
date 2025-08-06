@@ -37,6 +37,11 @@ public class Archive {
         loadPagesAndPlaceHolders();
 
     }
+    public void save() {
+        try {
+            ConfigFile.save();
+        } catch (Exception e) {}
+    }
     public void submit_items(List<ItemStack> items, Player p) {
         // make sure no items get through when they aren't supposed to
         if (!this.isAllow_submission()) return;
@@ -185,11 +190,14 @@ public class Archive {
         this.pages.set(index, page);
         return true;
     }
+    public void removePage(int page) {
+        if (page > this.pages.size()-1) return; // don't remove if index out of bounds
+        this.pages.remove(page);
+    }
     public void addPage(Page page) {this.pages.add(page);}
     public void savePages() {
         if (this.pages == null) return;
         for (int i = 0; i < this.pages.size(); i++) ConfigFile.set("gui." + i, this.pages.get(i).serialize());
-        try {ConfigFile.save();} catch (Exception e) {}
     }
 
 

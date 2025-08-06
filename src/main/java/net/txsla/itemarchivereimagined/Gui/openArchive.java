@@ -22,7 +22,7 @@ public class openArchive {
 
         // get the starting index for the vault populators
         int vaultIndex = 0;
-        for (int i = 1; i < number - 1; i++) vaultIndex += archive.getPagePopulators(i); // off by one error
+        for (int i = 1; i < number; i++) vaultIndex += archive.getPagePopulators(i); // off by one error
 
         // Get page format
         Inventory inventory = loadInv.create(page.getSize(), page.getName());

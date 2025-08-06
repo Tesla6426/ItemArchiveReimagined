@@ -135,7 +135,7 @@ public class Listener implements org.bukkit.event.Listener {
                 p.setItemOnCursor(ItemConverter.toItemStack(action_data));
                 return true;
             case 8:
-                //p.openSign(); write serializer
+                //p.openSign(); string<\n>string<\n>string<\n>string
                 return true;
             case 9:
                 //p.openBook(); write serializer

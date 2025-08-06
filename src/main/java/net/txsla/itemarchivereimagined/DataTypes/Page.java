@@ -6,7 +6,7 @@ import org.bukkit.event.inventory.InventoryType;
 public class Page {
     public Page(String name) {
         this.name = name;
-        this.size = 54;
+        this.size = 3;
         this.vault_populators = 0;
         this.format = null;
     }
@@ -23,7 +23,7 @@ public class Page {
     public String getName() {return this.name;}
     public int getSize() {return this.size;}
     public int getVault_populators() {return this.vault_populators;}
-    public String[] getFormat() {return format;};
+    public String[] getFormat() {return this.format;};
     public void setName(String name) {this.name = name;}
     public void setSize(int size) {this.size = size;}
     public void setVault_populators(int vault_populators) {this.vault_populators = vault_populators;}

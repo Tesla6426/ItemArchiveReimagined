@@ -9,15 +9,21 @@ permissions :
     default-permission: true
     default: true
   archive.tester:
-    description: "Allows the average player to interact with the archive"
+    description: "Allows the player to access debug features"
     default-permission: true
     default: true
   archive.editor:
-    description: "Allows the average player to interact with the archive"
+    description: "Allows the player to edit archives that they have been added to"
     default-permission: true
     default: true
 
 commands:
+  edit:
+    description: "Edit the properties of an archive"
+    usage: "/edit <archive> <property> <args>"
+    aliases: [ ]
+    permission: archive.editor
+    permission-message: "You do not have permission to use this command"
   submit:
     description: "Submit an item to the archives"
     usage: "/submit <archive>"
