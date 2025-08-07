@@ -218,6 +218,21 @@ public class Archive {
         // return false if placeholder is not found
         return false;
     }
+    public boolean setPlaceholder(String id, Placeholder p) {
+        // overrides a current placeholder with another
+        // this can create duplicate placeholder id's, make sure to prevent this when calling
+        for (Placeholder place : this.placeholder) if (place.getId().equals(id) ) { // find placeholder
+            // compiler should optimise this :)
+            int index = this.placeholder.indexOf(place);
+            this.placeholder.set(index, p);
+            return true;
+        }
+        return false;
+    }
+    public boolean hasPlaceholder(String id) {
+        for (Placeholder p : this.placeholder) if (p.getId().equals(id) ) return true;
+        return false;
+    }
     public List<Placeholder> getPlaceholders() { return this.placeholder; }
     public Placeholder getPlaceholderFromUUID(String uuid) {
         // search for placeholder by item uuid
@@ -233,5 +248,10 @@ public class Archive {
         // search for placeholder by id
         for (Placeholder p : this.placeholder) if (p.getId().equals(id) ) return p.getItem();
         return Storage.red_glass.getItemStack(); // return null if placeholder is not found
+    }
+    public void savePlaceholders() {
+        if (this.placeholder == null) {System.out.println("PLACEHOLDERS ARE NULL FOR " + name() + "!!!"); return;}
+        ConfigFile.remove("placeholders"); // clear current
+        for (Placeholder p : this.placeholder) ConfigFile.set("placeholders." + p.getId(), p.serialize()); // repopulate placeholders
     }
 }

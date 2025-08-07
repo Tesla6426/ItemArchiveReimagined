@@ -3,6 +3,7 @@ package net.txsla.itemarchivereimagined.Commands;
 import net.txsla.itemarchivereimagined.DataTypes.Archive;
 import net.txsla.itemarchivereimagined.DataTypes.Page;
 import net.txsla.itemarchivereimagined.DataTypes.Placeholder;
+import net.txsla.itemarchivereimagined.Gui.editArchive;
 import net.txsla.itemarchivereimagined.Storage;
 import net.txsla.itemarchivereimagined.load;
 import org.bukkit.command.Command;
@@ -10,12 +11,14 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class edit implements CommandExecutor, TabExecutor {
     @Override
@@ -29,18 +32,71 @@ public class edit implements CommandExecutor, TabExecutor {
         if (!Storage.archives.containsKey(args[0])) {sender.sendMessage("§aArchive " + args[0] + " does not exist!"); return true;}
         Archive archive = Storage.archives.get(args[0]);
 
-        int val, val2; double d_val; Page page; // temp vars, compiler should optimise this for me
+        int val, val2; double d_val; Page page; Placeholder placeholder; ItemStack item; Pattern regex = Pattern.compile("^\\w+$");// temp vars, compiler should optimise this for me
         switch (args[1]) {
             case "placeholder":
                 switch (args[2]) {
                     case "create":
+                        if (!regex.matcher(args[3]).matches()) {p.sendMessage("Invalid placeholder name. " + args[3] + " does not match pattern '^\\w+$'"); return true;}
+                        if (archive.hasPlaceholder(args[3])) {p.sendMessage("Placeholder " + args[3] + " already exists"); return true;}
+
+                        // get item and create placeholder
+                        item = p.getInventory().getItemInMainHand();
+                        if ((item == null) || (item.getType().isAir())) item = Storage.grass;
+                        placeholder = new Placeholder(args[3]);
+                        placeholder.setItem(item);
+
+                        archive.addPlaceholder(placeholder);
+                        p.sendMessage("Placeholder " + args[3] + " created for archive " + archive.name() + " with item " + placeholder.getItem().getItemMeta().getDisplayName());
+                        archive.savePlaceholders();
+
                         break;
                     case "modify":
-                        // action, action_data
+                        switch (args[4]) {
+                            case "item":
+                                if (!archive.hasPlaceholder(args[3])) {p.sendMessage("Placeholder " + args[3] + " not found."); return true;}
+                                // set placeholder to item in hand
+                                placeholder = archive.getPlaceholder(args[3]);
+                                item = p.getInventory().getItemInMainHand();
+                                if ((item == null) || (item.getType().isAir())) {p.sendMessage("You must be holding an item!"); return true;}
+                                placeholder.setItem(item); // set item to new item
+                                if (archive.setPlaceholder(args[3], placeholder)) { // replace placeholder
+                                    p.sendMessage("Placeholder " + args[3] + " item set to " + item.getItemMeta().getDisplayName());
+                                    archive.savePlaceholders();
+                                }else {
+                                    p.sendMessage("Placeholder " + args[3] + " not found."); return true;
+                                }
+                                break;
+                            case "action":
+                                if (!archive.hasPlaceholder(args[3])) {p.sendMessage("Placeholder " + args[3] + " not found."); return true;}
+                                // set action value to integer
+                                placeholder = archive.getPlaceholder(args[3]);
+                                try {
+                                    val = Integer.parseInt(args[5]);
+                                } catch (Exception e) {
+                                    p.sendMessage(args[5] + " is not a valid integer."); return true;
+                                }
+                                placeholder.setAction(val); // set action
+                                if (archive.setPlaceholder(args[3], placeholder)) { // replace placeholder
+                                    p.sendMessage("Placeholder " + args[3] + " action set to " + args[5]);
+                                    archive.savePlaceholders();
+                                }else {
+                                    p.sendMessage("Placeholder " + args[3] + " not found."); return true;
+                                }
+                                break;
+                            case "action_data":
+                                // set action data to specified type
+
+                                break;
+                        }
                         break;
                     case "remove":
-                        break;
-                    case "set_item":
+                        if (archive.removePlaceholder(args[3])) {
+                            p.sendMessage("Placeholder " + args[3] + " removed from archive " + archive.name());
+                            archive.savePlaceholders();
+                        }else {
+                            p.sendMessage("Placeholder " + args[3] + " not found."); return true;
+                        }
                         break;
                 }
                 break;
@@ -55,6 +111,7 @@ public class edit implements CommandExecutor, TabExecutor {
                         p.sendMessage("Page " + args[3] + " has been removed from " + args[0] + ".");
                         break;
                     case "create":
+                        if (!regex.matcher(args[3]).matches()) {p.sendMessage("Invalid page name. " + args[3] + " does not match pattern '^\\w+$'"); return true;}
                         archive.addPage(new Page("New.Page", 9, 3,new String[] {
                                 "air", "air", "air", "air", "air", "air", "air", "air", "air",
                                 "vault", "vault", "vault", "vault", "vault", "vault", "vault", "vault", "vault",
@@ -99,8 +156,12 @@ public class edit implements CommandExecutor, TabExecutor {
                                 p.sendMessage("Page " + args[3] + "'s size ha been set to " + args[5] + ".");
                                 break;
                             case "format":
-                                p.sendMessage("write gui code!!!!!");
-                                break;
+                                try {
+                                    val = Integer.parseInt(args[3]); if (val > archive.countPages()-1) {p.sendMessage("Page " + args[3] + " does not exist."); return true;}
+                                }catch (Exception e) { p.sendMessage(args[3] + " is not a valid Integer."); return true;}
+                                // hand over control to editor session
+                                editArchive.startSession(p, archive.name(), val);
+                                return true;
                         }
                         break;
                 }
@@ -153,9 +214,7 @@ public class edit implements CommandExecutor, TabExecutor {
                 }
                 break;
         }
-
-
-        archive.save();
+        archive.save(); // save config to SSD
         return true;
     }
     @Override

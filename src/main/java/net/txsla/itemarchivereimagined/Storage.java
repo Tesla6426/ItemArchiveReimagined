@@ -4,6 +4,7 @@ import net.txsla.itemarchivereimagined.DataTypes.Archive;
 import net.txsla.itemarchivereimagined.DataTypes.Item;
 import net.txsla.itemarchivereimagined.DataTypes.Placeholder;
 import net.txsla.itemarchivereimagined.DataTypes.Vault;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -23,6 +24,7 @@ public class Storage {
     public static ItemArchiveReimagined server;
     public static Item air;
     public static Item red_glass;
+    public static ItemStack grass;
     public static Placeholder invalid_placeholder;
     public static void saveToFile(List<String> lines, Path targetPath) throws IOException {
         Path tempFile = Files.createTempFile(targetPath.getParent(), "temp-", ".tmp");
