@@ -169,18 +169,22 @@ public class edit implements CommandExecutor, TabExecutor {
             case "config":
                 switch (args[2]) {
                     case "inf-pages":
+                        if (args[3].equals("query")) {p.sendMessage("Config option inf-pages is set to "+ archive.inf_pages()); return true;}
                         archive.setInf_pages(args[3].equals("true"));
                         p.sendMessage("Archive " + args[0] + " config inf-pages set to " + args[3].equals("true"));
                         break;
                     case "allow-submissions":
+                        if (args[3].equals("query")) {p.sendMessage("Config option allow-submissions is set to "+ archive.isAllow_submission()); return true;}
                         archive.setAllow_submission(args[3].equals("true"));
                         p.sendMessage("Archive " + args[0] + " config allow-submissions set to " + args[3].equals("true"));
                         break;
                     case "review-items":
+                        if (args[3].equals("query")) {p.sendMessage("Config review-items is set to "+ archive.getReview_items()); return true;}
                         archive.setReview_items(args[3].equals("true"));
                         p.sendMessage("Archive " + args[0] + " config review-items set to " + args[3].equals("true"));
                         break;
                     case "max-submission-size":
+                        if (args[3].equals("query")) {p.sendMessage("Config option max-submission-size is set to "+ archive.getMax_item_size()); return true;}
                         try {
                             val = Integer.parseInt(args[3]);
                         } catch (Exception e) { p.sendMessage(args[3] + " is not a valid integer"); return true; }
@@ -188,6 +192,7 @@ public class edit implements CommandExecutor, TabExecutor {
                         p.sendMessage("Archive " + args[0] + " config max-submission-size set to " + args[3]);
                         break;
                     case "min-submission-size":
+                        if (args[3].equals("query")) {p.sendMessage("Config option min-submission-size is set to "+ archive.getMin_item_size()); return true;}
                         try {
                             val = Integer.parseInt(args[3]);
                         } catch (Exception e) { p.sendMessage(args[3] + " is not a valid integer"); return true; }
@@ -195,6 +200,7 @@ public class edit implements CommandExecutor, TabExecutor {
                         p.sendMessage("Archive " + args[0] + " config min-submission-size set to " + args[3]);
                         break;
                     case "max-stack-size":
+                        if (args[3].equals("query")) {p.sendMessage("Config option max-stack-size is set to "+ archive.getMax_stack_size()); return true;}
                         try {
                             val = Integer.parseInt(args[3]);
                         } catch (Exception e) { p.sendMessage(args[3] + " is not a valid integer"); return true; }
@@ -202,6 +208,7 @@ public class edit implements CommandExecutor, TabExecutor {
                         p.sendMessage("Archive " + args[0] + " config max-stack-size set to " + args[3]);
                         break;
                     case "submit-delay":
+                        if (args[3].equals("query")) {p.sendMessage("Config option submit-delay is set to "+ archive.getSubmit_delay()); return true;}
                         try {
                             d_val = Double.parseDouble(args[3]);
                         } catch (Exception e) { p.sendMessage(args[3] + " is not a valid double"); return true; }
@@ -279,14 +286,17 @@ public class edit implements CommandExecutor, TabExecutor {
                     case "review-items":
                         list.add("true");
                         list.add("false");
+                        list.add("query");
                         break;
                     case "max-submission-size":
                     case "min-submission-size":
                     case "max-stack-size":
                         list.add("<int>");
+                        list.add("query");
                         break;
                     case "submit-delay":
                         list.add("<double>");
+                        list.add("query");
                         break;
                     default:
                         list.add("?");

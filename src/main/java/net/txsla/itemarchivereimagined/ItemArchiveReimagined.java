@@ -14,11 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class ItemArchiveReimagined extends JavaPlugin {
-
-    // for development  - remove later
-
-    public static boolean debug = true;
-
     @Override
     public void onEnable() {
         Storage.server = this;
@@ -26,6 +21,34 @@ public final class ItemArchiveReimagined extends JavaPlugin {
         // load archives
         load.archives();
 
+        // load default items
+        load_items_init();
+
+        // register commands
+        getCommand("create").setExecutor(new net.txsla.itemarchivereimagined.Commands.create() );
+        getCommand("raw").setExecutor(new net.txsla.itemarchivereimagined.Commands.raw() );
+        getCommand("search").setExecutor(new net.txsla.itemarchivereimagined.Commands.search() );
+        getCommand("open").setExecutor(new net.txsla.itemarchivereimagined.Commands.open() );
+        getCommand("submit").setExecutor(new net.txsla.itemarchivereimagined.Commands.submit() );
+        getCommand("edit").setExecutor(new net.txsla.itemarchivereimagined.Commands.edit() );
+
+        // dev / testing
+        getCommand("loadoldarchive").setExecutor(new net.txsla.itemarchivereimagined.Commands.loadoldarchive() );
+        getCommand("openDemoInventory").setExecutor(new net.txsla.itemarchivereimagined.Commands.openDemoInventory() );
+        getCommand("submitRaw").setExecutor(new submitRaw() );
+
+
+        getServer().getPluginManager().registerEvents(new Listener(), this);
+    }
+
+    @Override
+    public void onDisable() {
+        // Plugin shutdown logic
+    }
+
+
+
+    public static void load_items_init() {
         // load debug items
         List<String> list = new ArrayList<>(); ItemMeta meta;
 
@@ -109,25 +132,29 @@ public final class ItemArchiveReimagined extends JavaPlugin {
         editArchive.scroll_left.setItemMeta(meta);
         list.clear();
 
-        // register commands
-        getCommand("create").setExecutor(new net.txsla.itemarchivereimagined.Commands.create() );
-        getCommand("raw").setExecutor(new net.txsla.itemarchivereimagined.Commands.raw() );
-        getCommand("search").setExecutor(new net.txsla.itemarchivereimagined.Commands.search() );
-        getCommand("open").setExecutor(new net.txsla.itemarchivereimagined.Commands.open() );
-        getCommand("submit").setExecutor(new net.txsla.itemarchivereimagined.Commands.submit() );
-        getCommand("edit").setExecutor(new net.txsla.itemarchivereimagined.Commands.edit() );
+        editArchive.save = new ItemStack(Material.LIME_SHULKER_BOX);
+        meta = editArchive.save.getItemMeta();
+        meta.setDisplayName("SAVE");
+        list.add("Exit and save changes");
+        meta.setLore(list);
+        editArchive.save.setItemMeta(meta);
+        list.clear();
 
-        // dev / testing
-        getCommand("loadoldarchive").setExecutor(new net.txsla.itemarchivereimagined.Commands.loadoldarchive() );
-        getCommand("openDemoInventory").setExecutor(new net.txsla.itemarchivereimagined.Commands.openDemoInventory() );
-        getCommand("submitRaw").setExecutor(new submitRaw() );
+        editArchive.abort = new ItemStack(Material.RED_SHULKER_BOX);
+        meta = editArchive.abort.getItemMeta();
+        meta.setDisplayName("ABORT");
+        list.add("Exit WITHOUT saving");
+        meta.setLore(list);
+        editArchive.abort.setItemMeta(meta);
+        list.clear();
 
-
-        getServer().getPluginManager().registerEvents(new Listener(), this);
-    }
-
-    @Override
-    public void onDisable() {
-        // Plugin shutdown logic
+        editArchive.save_session = new ItemStack(Material.LIGHT_BLUE_SHULKER_BOX);
+        meta = editArchive.save_session.getItemMeta();
+        meta.setDisplayName("Save to Cache");
+        list.add("Saves all current changes to session cache");
+        list.add("Make sure to save after making any changes");
+        meta.setLore(list);
+        editArchive.save_session.setItemMeta(meta);
+        list.clear();
     }
 }

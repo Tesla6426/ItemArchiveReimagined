@@ -16,7 +16,7 @@ public class submitArchive {
         Page page = archive.getPage(0); // page zero is submit
 
         // Get page format
-        Inventory inventory = loadInv.create(page.getSize(), page.getName());
+        Inventory inventory = loadInv.create(page.getSize(), page.getName().replaceAll("%page%", "0"));
         String[] format = page.getFormat();
 
         // process placeholders and add them to inventory

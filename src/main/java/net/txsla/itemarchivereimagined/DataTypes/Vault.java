@@ -100,6 +100,36 @@ public class Vault {
         }
     }
 
+    // remove item by UUID
+    public boolean removeItembyUUID(String UUID) {
+        if (!item_uuids.contains(UUID)) return false;
+        for (int index = 0; index < items.size(); index++) {
+            if (items.get(index).getUUID().equals(UUID)) {
+                items.remove(index);
+                item_uuids.remove(UUID);
+                return true;
+            }
+        }
+        return false;
+    }
+    public int removeItemsByUUID(List<String> UUID) {
+        int counter = 0;
+        for (String uuid : UUID) {if (removeItembyUUID(uuid)) counter++;}
+        return counter;
+    }
+    public int removeItemsBySubmitter(String submitter) {
+        int counter = 0;
+
+        // find all items from submitter
+        List<Item> to_remove = searchFromSubmitterName("^"+submitter+"$", 999);
+        if (to_remove.isEmpty()) return 0;
+
+        // get uuids of items that were found
+        List<String> uuids = new ArrayList<>();
+        for (Item item : to_remove) uuids.add(item.getUUID());
+
+        return removeItemsByUUID(uuids);
+    }
 
     // search features, these are slow, so make sure only supporters gain access
     public List<Item> searchFromItemName(String regex, int amount) {

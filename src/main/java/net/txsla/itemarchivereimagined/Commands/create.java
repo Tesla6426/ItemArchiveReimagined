@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -25,6 +26,9 @@ public class create implements CommandExecutor, TabExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args)
     {
         if (args.length < 1) return false;
+
+        Pattern regex = Pattern.compile("^\\w+$");
+        if (!regex.matcher(args[3]).matches()) {sender.sendMessage("Invalid archive name. " + args[3] + " does not match pattern '^\\w+$'"); return true;}
 
         if (Storage.archives.containsKey(args[0])) sender.sendMessage("§aArchive " + args[0] + " already exists, reloading instead.");
             else sender.sendMessage("§aArchive " + args[0] + " created!");

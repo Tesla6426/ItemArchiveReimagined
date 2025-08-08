@@ -25,7 +25,7 @@ public class openArchive {
         for (int i = 1; i < number; i++) vaultIndex += archive.getPagePopulators(i); // off by one error
 
         // Get page format
-        Inventory inventory = loadInv.create(page.getSize(), page.getName());
+        Inventory inventory = loadInv.create(page.getSize(), page.getName().replaceAll("%page%", ""+number));
         String[] format = page.getFormat();
 
 
@@ -45,7 +45,9 @@ public class openArchive {
                     break;
                 default:
                     // add placeholder
-                    inventory.setItem(slot, archive.getPlaceholder(placeholder).getItem());
+                    try {
+                        inventory.setItem(slot, archive.getPlaceholder(placeholder).getItem());
+                    } catch (Exception e) {/*ignore*/}
                     break;
             }
             slot++;

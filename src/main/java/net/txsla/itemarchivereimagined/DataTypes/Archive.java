@@ -201,7 +201,6 @@ public class Archive {
     }
 
 
-
     // code for managing placeholders
     public boolean addPlaceholder(Placeholder added_placeholder) {
         // return false if placeholder of the same id is already in the list

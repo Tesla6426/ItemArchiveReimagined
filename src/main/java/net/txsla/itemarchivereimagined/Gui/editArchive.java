@@ -5,6 +5,7 @@ import net.txsla.itemarchivereimagined.DataTypes.Item;
 import net.txsla.itemarchivereimagined.DataTypes.Page;
 import net.txsla.itemarchivereimagined.DataTypes.PageEditor;
 import net.txsla.itemarchivereimagined.Storage;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -34,9 +35,42 @@ public class editArchive {
         // start editor session
         session.put(p.getName(), new PageEditor(p, archive_name, page_number));
     }
+    public static void reRender(String name ) {
+        if (!session.containsKey(name)) return;
+        session.get(name).loadPlayerInventory();
+        session.get(name).loadLayoutFromInventory();
+        session.get(name).loadInventoriesFromLayout();
+        session.get(name).showDefaultView();
+    }
     public static void endSession(String name) {
         if (!session.containsKey(name)) return;
         session.get(name).endSession();
         session.remove(name);
+    }
+    public static void saveAndEndSession(String name) {
+        if (!session.containsKey(name)) return;
+
+        session.get(name).saveToArchive();
+        session.get(name).endSession();
+        session.remove(name);
+        Storage.gui_tracker.remove(name);
+
+    }
+    public static void swapView(String name, boolean view) {
+        if (!session.containsKey(name)) return;
+        if (session.get(name).is_default_view) session.get(name).showRawView();
+            else session.get(name).showDefaultView();
+    }
+    public static void reloadPlayerInventory(String name) {
+        if (!session.containsKey(name)) return;
+        session.get(name).loadPlayerInventory();
+    }
+    public static void saveInventory(String name) {
+        if (!session.containsKey(name)) return;
+        session.get(name).saveInventory();
+    }
+    public static void scrollPlaceholders(String name, Boolean bool) {
+        if (!session.containsKey(name)) return;
+        session.get(name).placeholderScroller(bool);
     }
 }

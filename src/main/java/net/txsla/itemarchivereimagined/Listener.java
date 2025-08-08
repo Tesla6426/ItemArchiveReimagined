@@ -90,11 +90,15 @@ public class Listener implements org.bukkit.event.Listener {
                 break;
             case "edit":
                 String clicked_UUID = hash.getUUID(event.getCurrentItem());
-
                 if (hash.getUUID(editArchive.null_slot).equals(clicked_UUID)) {event.setCancelled(true); return;}
-
-
-
+                if (hash.getUUID(editArchive.save_session).equals(clicked_UUID)) {event.setCancelled(true); editArchive.saveInventory(p.getName()); return;}
+                if (hash.getUUID(editArchive.reload_selection).equals(clicked_UUID)) {event.setCancelled(true); editArchive.reloadPlayerInventory(p.getName()); return;}
+                if (hash.getUUID(editArchive.scroll_left).equals(clicked_UUID)) {event.setCancelled(true); editArchive.scrollPlaceholders(p.getName(), false); return;}
+                if (hash.getUUID(editArchive.scroll_right).equals(clicked_UUID)) {event.setCancelled(true); editArchive.scrollPlaceholders(p.getName(), true); return;}
+                if (hash.getUUID(editArchive.abort).equals(clicked_UUID)) {event.setCancelled(true); editArchive.endSession(p.getName()); return;}
+                if (hash.getUUID(editArchive.save).equals(clicked_UUID)) {event.setCancelled(true); editArchive.saveAndEndSession(p.getName()); return;}
+                if (hash.getUUID(editArchive.swap_view_1).equals(clicked_UUID)) {event.setCancelled(true); editArchive.swapView(p.getName(), true); return;}
+                if (hash.getUUID(editArchive.swap_view_2).equals(clicked_UUID)) {event.setCancelled(true); editArchive.swapView(p.getName(), false); return;}
                 break;
             case "review":
                 // this gui is for accepting or rejecting items
@@ -152,10 +156,12 @@ public class Listener implements org.bukkit.event.Listener {
 
         // used for editor sessions
         if (Storage.gui_tracker.containsKey(event.getPlayer().getName())) {
+            System.out.println("Tracker " +  Storage.gui_tracker.get(event.getPlayer().getName()));
             if (Storage.gui_tracker.get(event.getPlayer().getName()).split("¦")[2].equals("ignore")) return;
             if (Storage.gui_tracker.get(event.getPlayer().getName()).split("¦")[2].equals("lock")) {
-                // lock is currently only used to detect when a player tries to leave an edit session
-                editArchive.endSession(event.getPlayer().getName()); return;
+                editArchive.endSession(event.getPlayer().getName());
+                event.getPlayer().sendMessage("Editor session aborted!");
+                return;
             }
         }
 

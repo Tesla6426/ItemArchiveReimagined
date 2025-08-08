@@ -1,5 +1,6 @@
 package net.txsla.itemarchivereimagined;
 
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -29,11 +30,12 @@ public class hash {
     }
     public static String getUUID(ItemStack item) {
         // add item name and type, then hash
+        if (item == null) item = new ItemStack(Material.AIR);
 
-        // handle null item
+        // handle null name
         ItemMeta meta = item.getItemMeta(); String name;
         if (meta == null) name = "null-" + item.getType();
-        else name = meta.getDisplayName();
+            else name = meta.getDisplayName();
 
         return sha256(name + item.getType());
     }
