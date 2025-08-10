@@ -3,7 +3,9 @@ package net.txsla.itemarchivereimagined.Commands;
 import net.txsla.itemarchivereimagined.DataTypes.Archive;
 import net.txsla.itemarchivereimagined.DataTypes.Page;
 import net.txsla.itemarchivereimagined.DataTypes.Placeholder;
+import net.txsla.itemarchivereimagined.DataTypes.Sound;
 import net.txsla.itemarchivereimagined.Gui.editArchive;
+import net.txsla.itemarchivereimagined.ItemConverter;
 import net.txsla.itemarchivereimagined.Storage;
 import net.txsla.itemarchivereimagined.load;
 import org.bukkit.command.Command;
@@ -32,6 +34,9 @@ public class edit implements CommandExecutor, TabExecutor {
         if (!Storage.archives.containsKey(args[0])) {sender.sendMessage("§aArchive " + args[0] + " does not exist!"); return true;}
         Archive archive = Storage.archives.get(args[0]);
 
+        // check perms
+        if (!archive.isEditor(p.getName())) { p.sendMessage("You do not have permission to edit this archive!"); return true;}
+
         int val, val2; double d_val; Page page; Placeholder placeholder; ItemStack item; Pattern regex = Pattern.compile("^\\w+$");// temp vars, compiler should optimise this for me
         switch (args[1]) {
             case "placeholder":
@@ -52,9 +57,33 @@ public class edit implements CommandExecutor, TabExecutor {
 
                         break;
                     case "modify":
+                        if (!archive.hasPlaceholder(args[3])) {p.sendMessage("Placeholder " + args[3] + " not found."); return true;}
                         switch (args[4]) {
+                            case "click_sound":
+                                float volume = 1, pitch = 1; String sound;
+                                if (args.length < 6) {return true;}
+
+                                sound = args[5];
+                                try {
+                                    if (args.length > 6) volume = Float.parseFloat(args[6]);
+                                    if (args.length > 7) pitch = Float.parseFloat(args[7]);
+                                } catch (Exception e) {
+                                    p.sendMessage("Either volume or pitch is not a valid number, both have been set to '1.0'.");
+                                    volume =1;
+                                }
+
+                                placeholder = archive.getPlaceholder(args[3]);
+                                placeholder.setSound(new Sound(sound, volume, pitch)); // set action
+                                if (archive.setPlaceholder(args[3], placeholder)) { // replace placeholder
+                                    p.sendMessage("Placeholder " + args[3] + " sound set to " + args[5]);
+                                    archive.savePlaceholders();
+                                }else {
+                                    p.sendMessage("Placeholder " + args[3] + " not found."); return true;
+                                }
+
+
+                                break;
                             case "item":
-                                if (!archive.hasPlaceholder(args[3])) {p.sendMessage("Placeholder " + args[3] + " not found."); return true;}
                                 // set placeholder to item in hand
                                 placeholder = archive.getPlaceholder(args[3]);
                                 item = p.getInventory().getItemInMainHand();
@@ -68,7 +97,6 @@ public class edit implements CommandExecutor, TabExecutor {
                                 }
                                 break;
                             case "action":
-                                if (!archive.hasPlaceholder(args[3])) {p.sendMessage("Placeholder " + args[3] + " not found."); return true;}
                                 // set action value to integer
                                 placeholder = archive.getPlaceholder(args[3]);
                                 try {
@@ -86,7 +114,35 @@ public class edit implements CommandExecutor, TabExecutor {
                                 break;
                             case "action_data":
                                 // set action data to specified type
-
+                                if (args.length < 6) return false;
+                                switch (args[5]) {
+                                    case "string":
+                                        if (args.length < 7) return false;
+                                        placeholder = archive.getPlaceholder(args[3]);
+                                        placeholder.setAction_data(args[6]);
+                                        if (archive.setPlaceholder(args[3], placeholder)) { // replace placeholder
+                                            p.sendMessage("Placeholder " + args[3] + " action set to " + args[5]);
+                                            archive.savePlaceholders();
+                                        }else {
+                                            p.sendMessage("Placeholder " + args[3] + " not found."); return true;
+                                        }
+                                        break;
+                                    case "item":
+                                        placeholder = archive.getPlaceholder(args[3]);
+                                        item = p.getInventory().getItemInMainHand();
+                                        if ((item == null) || (item.getType().isAir())) {p.sendMessage("You must be holding an item!"); return true;}
+                                        placeholder.setAction_data(ItemConverter.toString(item)); // set item to new item
+                                        if (archive.setPlaceholder(args[3], placeholder)) { // replace placeholder
+                                            p.sendMessage("Placeholder " + args[3] + " action_data set to " + item.getItemMeta().getDisplayName());
+                                            archive.savePlaceholders();
+                                        }else {
+                                            p.sendMessage("Placeholder " + args[3] + " not found."); return true;
+                                        }
+                                        break;
+                                    case "sign":
+                                        p.sendMessage("The sign action value is currently not functional");
+                                        return true;
+                                }
                                 break;
                         }
                         break;
@@ -134,7 +190,19 @@ public class edit implements CommandExecutor, TabExecutor {
                         break;
                     case "modify":
                         switch (args[4]) {
-                            case "name":
+                            case "vault_populator_override":
+                                try {
+                                    val = Integer.parseInt(args[3]);
+                                    val2 = Integer.parseInt(args[5]);
+                                    if (val > archive.countPages()-1) {p.sendMessage("Page " + args[3] + " does not exist."); return true;}
+                                }catch (Exception e) { p.sendMessage(args[3] + " is not a valid Integer."); return true;}
+                                page = archive.getPage(val);
+                                page.setVault_populators(val2);
+                                archive.setPage(val, page);
+                                archive.savePages();
+                                p.sendMessage("Page " + args[3] + "'s vault_populators has been set to " + args[5] + ".");
+                                break;
+                            case "title":
                                 try {
                                     val = Integer.parseInt(args[3]); if (val > archive.countPages()-1) {p.sendMessage("Page " + args[3] + " does not exist."); return true;}
                                 }catch (Exception e) { p.sendMessage(args[3] + " is not a valid Integer."); return true;}
@@ -153,7 +221,7 @@ public class edit implements CommandExecutor, TabExecutor {
                                 page.setSize(val2);
                                 archive.setPage(val, page);
                                 archive.savePages();
-                                p.sendMessage("Page " + args[3] + "'s size ha been set to " + args[5] + ".");
+                                p.sendMessage("Page " + args[3] + "'s size has been set to " + args[5] + ".");
                                 break;
                             case "format":
                                 try {
@@ -315,11 +383,13 @@ public class edit implements CommandExecutor, TabExecutor {
                                 list.add("action"); // <int>
                                 list.add("action_data"); // string, item, book, sign
                                 list.add("item"); // ItemStack from mainhand
+                                list.add("click_sound");
                                 break;
                             case "page":
                                 list.add("size"); // <int>
-                                list.add("name"); // <string>, minimessage
+                                list.add("title"); // <string>, minimessage
                                 list.add("format"); // go to gui editor
+                                list.add("vault_populator_override"); // overrides the vault_populator value for more control over the page loading
                                 break;
                         }
                         break;
@@ -330,17 +400,17 @@ public class edit implements CommandExecutor, TabExecutor {
                 break;
             case 6:
                 switch (args[4]) {
-                    case "name":
+                    case "title":
                         list.add("<string>");
                         break;
                     case "action":
                     case "size":
+                    case "vault_populator_override":
                         list.add("<int>");
                         break;
                     case "action_data":
                         list.add("string");
                         list.add("sign");
-                        list.add("book");
                         list.add("item");
                 }
                 break;

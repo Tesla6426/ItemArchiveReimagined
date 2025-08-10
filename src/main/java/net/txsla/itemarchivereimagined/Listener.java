@@ -4,6 +4,7 @@ import net.txsla.itemarchivereimagined.DataTypes.Archive;
 import net.txsla.itemarchivereimagined.DataTypes.Page;
 import net.txsla.itemarchivereimagined.DataTypes.Placeholder;
 import net.txsla.itemarchivereimagined.Gui.editArchive;
+import org.bukkit.Sound;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,14 +14,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
 public class Listener implements org.bukkit.event.Listener {
+    public static HashMap<String , Long> timer = new HashMap<>();
     @EventHandler
     public void OnClick(InventoryClickEvent event) {
         // ignore completely if item is null
-        System.out.println("Slot #" + event.getSlot());
         if (event.getCurrentItem() == null) return;
 
         // if player is not in a ItemArchive gui, then do not process input
@@ -56,6 +58,16 @@ public class Listener implements org.bukkit.event.Listener {
         String action_data = placeholder.getAction_data();
         action = placeholder.getAction();
 
+        // play sound
+        try {
+            if (placeholder.getSound().getBukkitSound() != null) { // skip if sound is null
+
+                p.playSound(p.getLocation(), placeholder.getSound().getBukkitSound(), 1.0f, 1.0f);
+            }
+        } catch (Exception e) {
+            p.sendMessage("Invalid sound: " + placeholder.getSound().getSound());
+        }
+
         // get gui
         switch (gui) {
             // these two are for when players open the archives
@@ -64,10 +76,18 @@ public class Listener implements org.bukkit.event.Listener {
                     event.setCancelled(true);
 
                     // ignore submit banned players
-                    if (archive.getSubmissionBans().contains(p.getName())) { p.closeInventory(); p.sendMessage("Items Submitted!"); return;}
+                    if (archive.getSubmissionBans().contains(p.getName())) { p.closeInventory(); p.sendMessage("§aItems Submitted!"); return;}
 
                     // check to see if player has a submit timer
+                    if (!timer.containsKey(p.getName())) timer.put(p.getName(), System.currentTimeMillis());
+                        else {
+                        if (!((System.currentTimeMillis() - timer.get(p.getName())) > (archive.getSubmit_delay() * 1000))) {
+                            p.sendMessage("§cYou must wait " + ((int) (archive.getSubmit_delay() - (System.currentTimeMillis() - timer.get(p.getName())) / 1000)) + " seconds before submitting.");
+                            return;
+                        }
+                    }
 
+                    timer.put(p.getName(), System.currentTimeMillis());
 
                     // cycle through all slots and add item to array if it is in a submission slot
                     String[] format = archive.getPage(0).getFormat();
@@ -142,10 +162,10 @@ public class Listener implements org.bukkit.event.Listener {
                 p.setItemOnCursor(ItemConverter.toItemStack(action_data));
                 return true;
             case 8:
-                //p.openSign(); string<\n>string<\n>string<\n>string
+                //p.openSign(); //string<\n>string<\n>string<\n>string
                 return true;
             case 9:
-                //p.openBook(); write serializer
+                p.openBook(ItemConverter.toItemStack(action_data));
                 return true;
         }
         return false;
@@ -156,11 +176,10 @@ public class Listener implements org.bukkit.event.Listener {
 
         // used for editor sessions
         if (Storage.gui_tracker.containsKey(event.getPlayer().getName())) {
-            System.out.println("Tracker " +  Storage.gui_tracker.get(event.getPlayer().getName()));
             if (Storage.gui_tracker.get(event.getPlayer().getName()).split("¦")[2].equals("ignore")) return;
             if (Storage.gui_tracker.get(event.getPlayer().getName()).split("¦")[2].equals("lock")) {
                 editArchive.endSession(event.getPlayer().getName());
-                event.getPlayer().sendMessage("Editor session aborted!");
+                event.getPlayer().sendMessage("§cEditor session aborted!");
                 return;
             }
         }

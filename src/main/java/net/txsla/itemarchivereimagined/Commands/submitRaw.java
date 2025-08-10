@@ -53,10 +53,10 @@ public class submitRaw implements CommandExecutor, TabExecutor {
         Vault vault = Storage.vaults.get(args[0]);
         for (ItemStack item : items) {
             if (vault.addItem(new Item(item, p))) {
-                sender.sendMessage("Item " + item.getItemMeta().getDisplayName() + " added to vault");
+                sender.sendMessage("§aItem " + item.getItemMeta().getDisplayName() + "§a added to vault");
                 items_added++;
             }
-            else sender.sendMessage("Item " + item.getItemMeta().getDisplayName() + " rejected from vault. isDuplicate?");
+            else sender.sendMessage("§cItem " + item.getItemMeta().getDisplayName() + "§c rejected from vault. isDuplicate?");
         }
 
         // save vault

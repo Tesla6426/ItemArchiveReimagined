@@ -1,5 +1,6 @@
 package net.txsla.itemarchivereimagined.Commands;
 
+import net.txsla.itemarchivereimagined.DataTypes.Archive;
 import net.txsla.itemarchivereimagined.DataTypes.Item;
 import net.txsla.itemarchivereimagined.DataTypes.Vault;
 import net.txsla.itemarchivereimagined.Storage;
@@ -32,6 +33,9 @@ public class removeItem implements CommandExecutor, TabExecutor {
         if (!Storage.archives.containsKey(args[0])) { sender.sendMessage("§cArchive " + args[0] + " does not exist"); return true; }
         String uuid = null;
 
+        Archive archive = Storage.archives.get(args[0]);
+        if (!archive.isEditor(p.getName())) { p.sendMessage("§cYou do not have permission to edit this archive!"); return true;}
+
         Vault vault = Storage.vaults.get(args[0] + "-main");
 
         switch (args[1]) {
@@ -53,7 +57,7 @@ public class removeItem implements CommandExecutor, TabExecutor {
                 if (args.length < 3) return true; // user needs to actually give a name
 
                 Pattern regex = Pattern.compile("^\\w+$");
-                if (!regex.matcher(args[3]).matches()) {sender.sendMessage("Invalid player name. " + args[3] + " does not match pattern '^\\w+$'"); return true;}
+                if (!regex.matcher(args[2]).matches()) {sender.sendMessage("Invalid player name. " + args[2] + " does not match pattern '^\\w+$'"); return true;}
 
                 p.sendMessage("Removing " + args[2] + "'s items from the archive.");
                 int removed = vault.removeItemsBySubmitter(args[2]);
@@ -61,7 +65,7 @@ public class removeItem implements CommandExecutor, TabExecutor {
 
                 break;
             default:
-                sender.sendMessage("Unknown argument?");
+                sender.sendMessage("§cUnknown argument?");
                 return true;
         }
         return true;

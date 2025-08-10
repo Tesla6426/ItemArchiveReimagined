@@ -21,8 +21,8 @@ public class openArchive {
         Page page = archive.getPage(number);
 
         // get the starting index for the vault populators
-        int vaultIndex = 0;
-        for (int i = 1; i < number; i++) vaultIndex += archive.getPagePopulators(i); // off by one error
+        int vaultIndex = Storage.vaults.get(archive_name + "-main").getSize();
+        for (int i = 1; i < number; i++) vaultIndex -= archive.getPagePopulators(i); // off by one error
 
         // Get page format
         Inventory inventory = loadInv.create(page.getSize(), page.getName().replaceAll("%page%", ""+number));
@@ -41,7 +41,7 @@ public class openArchive {
                 case "vault":
                     // add item from vault (main)
                     inventory.setItem(slot, Storage.vaults.get(archive_name + "-main").getItem(vaultIndex).getItemStack());
-                    vaultIndex++;
+                    vaultIndex--;
                     break;
                 default:
                     // add placeholder

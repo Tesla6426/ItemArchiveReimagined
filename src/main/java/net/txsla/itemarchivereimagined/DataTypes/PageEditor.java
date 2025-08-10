@@ -20,6 +20,7 @@ public class PageEditor {
     private Inventory default_view, raw_view;
     public boolean is_default_view;
     private int scroller_index;
+    private int vault_populators;
     private Page page;
     private String[] format;
     private int page_number;
@@ -41,8 +42,8 @@ public class PageEditor {
         page = deserialize.page(  archive.getPage(page_number).serialize() );
 
         // set initial values
-        default_view = loadInv.create(page.getSize(), "Session.Edit.Page.archive=" + archive.name() + ".page=" + page_number + "; display_name = " + page.getName() );
-        raw_view = loadInv.create(6, "Session.Raw.Page.archive=" + archive.name() + ".page=" + page_number + "; display_name = " + page.getName() );
+        default_view = loadInv.create(page.getSize(), "Editor.Default.archive=" + archive.name() + ".page=" + page_number + "; display_name = " + page.getName() );
+        raw_view = loadInv.create(6, "Editor.Raw.archive=" + archive.name() + ".page=" + page_number + "; display_name = " + page.getName() );
         placeholders = archive.getPlaceholders();
         format = page.getFormat();
         loadLayoutFromFormat();
@@ -103,7 +104,10 @@ public class PageEditor {
         List<String> lore = new ArrayList<>();
         lore.add("Action: " + p.getAction());
         lore.add("Action_Data: " + (p.getAction_data().length() > 31 ? p.getAction_data().substring(0, 28) + "..." : p.getAction_data()));
-        lore.add("Item " + p.getItem().getType());
+        lore.add("Item: " + p.getItem().getType());
+        lore.add("Sound: " + p.getSound().getSound());
+        lore.add("Sound_Volume: " + p.getSound().getVolume());
+        lore.add("Sound_Pitch: " + p.getSound().getPitch());
         meta.setLore(lore);
         paper.setItemMeta(meta);
         return paper;
@@ -113,7 +117,7 @@ public class PageEditor {
         Page temp_page = archive.getPage(page_number);
         saveLayoutToFormat();
         temp_page.setFormat(format);
-        System.out.println(format);
+        temp_page.setVault_populators(vault_populators);
         archive.setPage(page_number, temp_page);
         archive.savePages();
         archive.save();
@@ -121,7 +125,12 @@ public class PageEditor {
     }
     public void saveLayoutToFormat() {
         // this is what gets exported back to the archive :)
-        for (int i = 0; i < layout.length; i++) format[i] = getPlaceholderId(layout[i]);
+        vault_populators = 0;
+        format = new String[layout.length];
+        for (int i = 0; i < layout.length; i++) {
+            format[i] = getPlaceholderId(layout[i]);
+            if (format[i].equals("vault")) vault_populators++;
+        }
     }
     public void showDefaultView() {
         if (is_default_view) return;
@@ -164,7 +173,7 @@ public class PageEditor {
     }
     private void loadLayoutFromFormat() {
         layout = new ItemStack[default_view.getSize()];
-        for (int i = 0; i < layout.length; i++) {
+        for (int i = 0; i < format.length; i++) {
             switch (format[i]) {
                 case "air":
                     layout[i] = editArchive.air_placeholder;

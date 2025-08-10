@@ -28,7 +28,7 @@ public class create implements CommandExecutor, TabExecutor {
         if (args.length < 1) return false;
 
         Pattern regex = Pattern.compile("^\\w+$");
-        if (!regex.matcher(args[3]).matches()) {sender.sendMessage("Invalid archive name. " + args[3] + " does not match pattern '^\\w+$'"); return true;}
+        if (!regex.matcher(args[0]).matches()) {sender.sendMessage("Invalid archive name. " + args[0] + " does not match pattern '^\\w+$'"); return true;}
 
         if (Storage.archives.containsKey(args[0])) sender.sendMessage("§aArchive " + args[0] + " already exists, reloading instead.");
             else sender.sendMessage("§aArchive " + args[0] + " created!");

@@ -22,10 +22,10 @@ public class submit implements CommandExecutor, TabExecutor {
 
         Player p = (Player) sender;
 
-        if (!Storage.archives.containsKey(args[0])) {sender.sendMessage("§aArchive " + args[0] + " does not exist!"); return true;}
+        if (!Storage.archives.containsKey(args[0])) {sender.sendMessage("§cArchive " + args[0] + " does not exist!"); return true;}
         Archive archive = Storage.archives.get(args[0]);
 
-        if (!archive.isAllow_submission()) {p.sendMessage("Submissions are not enabled for this archive!"); return true;}
+        if (!archive.isAllow_submission()) {p.sendMessage("§cSubmissions are not enabled for this archive!"); return true;}
 
 
         // hand over control to gui

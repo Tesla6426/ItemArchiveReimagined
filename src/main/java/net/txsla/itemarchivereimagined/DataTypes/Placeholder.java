@@ -21,23 +21,33 @@ public class Placeholder {
     private String action_data;
     private String hash;
     private ItemStack item;
+    private Sound click_sound;
     public Placeholder(String id) {
         this.id = id;
         this.item = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
         this.action = 0;
         this.action_data = "none";
+        this.click_sound = new Sound("null", 1 , 1);
         this.hash = net.txsla.itemarchivereimagined.hash.getUUID(this.item);
     }
-    public Placeholder(String id, int action, String action_data, ItemStack item) {
+    public Placeholder(String id, int action, String action_data, String sound_serialized, ItemStack item) {
         this.id = id;
         this.item = item;
         this.action = action;
         this.action_data = action_data;
+        this.click_sound = net.txsla.itemarchivereimagined.deserialize.sound(sound_serialized);
         this.hash = net.txsla.itemarchivereimagined.hash.getUUID(this.item);
     }
     public void setItem(ItemStack item) {
         this.item = item;
         this.hash = net.txsla.itemarchivereimagined.hash.getUUID(this.item);
+    }
+    public Sound getSound() { return this.click_sound;}
+    public void setSound(String sound_serialized) {
+        this.click_sound = net.txsla.itemarchivereimagined.deserialize.sound(sound_serialized);
+    }
+    public void setSound(Sound sound) {
+        this.click_sound = sound;
     }
     public void setAction(int action) {this.action = action;}
     public void setAction_data(String action_data) {this.action_data = action_data;}
@@ -52,6 +62,7 @@ public class Placeholder {
                 b64.encode(this.id) + "¦" +
                     b64.encode(""+this.action) + "¦" +
                     b64.encode(this.action_data) + "¦" +
+                    b64.encode(this.click_sound.serialize())+ "¦" +
                     b64.encode(ItemConverter.toString(this.item))
                 );
     }
@@ -61,7 +72,8 @@ public class Placeholder {
                 b64.decode(data[0]),
                 Integer.parseInt(b64.decode(data[1])),
                 b64.decode(data[2]),
-                ItemConverter.toItemStack(b64.decode(data[3]))
+                b64.decode(data[3]),
+                ItemConverter.toItemStack(b64.decode(data[4]))
         );
     }
 }

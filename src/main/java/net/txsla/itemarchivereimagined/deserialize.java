@@ -3,6 +3,7 @@ package net.txsla.itemarchivereimagined;
 import net.txsla.itemarchivereimagined.DataTypes.Item;
 import net.txsla.itemarchivereimagined.DataTypes.Page;
 import net.txsla.itemarchivereimagined.DataTypes.Placeholder;
+import net.txsla.itemarchivereimagined.DataTypes.Sound;
 import org.bukkit.inventory.ItemStack;
 
 public class deserialize {
@@ -12,7 +13,8 @@ public class deserialize {
                 b64.decode(data[0]),
                 Integer.parseInt(b64.decode(data[1])),
                 b64.decode(data[2]),
-                ItemConverter.toItemStack(b64.decode(data[3]))
+                b64.decode(data[3]),
+                ItemConverter.toItemStack(b64.decode(data[4]))
         );
     }
     public static Page page(String serialised) {
@@ -37,6 +39,21 @@ public class deserialize {
                 b64.decode(data[5]),
                 ItemConverter.toItemStack(b64.decode(data[6])),
                 b64.decode(data[7])
+        );
+    }
+    public static Sound sound(String serialized) {
+        String[] data = b64.decode(serialized).split("¦");
+        float volume, pitch;
+        try {
+            volume = Float.parseFloat(b64.decode(data[1]));
+            pitch = Float.parseFloat(b64.decode(data[2]));
+        }catch (Exception e) {
+            return new Sound(b64.decode(data[0]));
+        }
+        return new Sound(
+                b64.decode(data[0]),
+                volume,
+                pitch
         );
     }
 }

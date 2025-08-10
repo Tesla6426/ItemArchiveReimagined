@@ -33,6 +33,9 @@ public class hash {
         if (item == null) item = new ItemStack(Material.AIR);
 
         // handle null name
+
+        // I need to make this have less overlap
+
         ItemMeta meta = item.getItemMeta(); String name;
         if (meta == null) name = "null-" + item.getType();
             else name = meta.getDisplayName();

@@ -18,6 +18,30 @@ permissions :
     default: true
 
 commands:
+  submit-ban:
+    description: "Bans a player from submitting items."
+    usage: "/submit_ban <archive> <player>"
+    aliases: [ ]
+    permission: archive.editor
+    permission-message: "You do not have permission to use this command"
+  add-editor:
+    description: "Adds an editor to the archive"
+    usage: "/add-editor <archive> <player>"
+    aliases: [ ]
+    permission: archive.editor
+    permission-message: "You do not have permission to use this command"
+  count-items:
+    description: "Counts the items in a vault"
+    usage: "/count-items <vault>"
+    aliases: [ ]
+    permission: archive.editor
+    permission-message: "You do not have permission to use this command"
+  remove-item:
+    description: "Removes an item(s) from an archive"
+    usage: "/remove-item <archive> <args>"
+    aliases: [ ]
+    permission: archive.editor
+    permission-message: "You do not have permission to use this command"
   edit:
     description: "Edit the properties of an archive"
     usage: "/edit <archive> <property> <args>"
@@ -36,7 +60,7 @@ commands:
     aliases: []
     permission: archive.editor
     permission-message: "You do not have permission to use this command"
-  create:
+  create-archive:
     description: "Create a new Archive"
     usage: "/create <archive>"
     aliases: [ ]

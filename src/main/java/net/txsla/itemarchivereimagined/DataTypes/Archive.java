@@ -52,9 +52,14 @@ public class Archive {
         if (this.getReview_items()) vault = Storage.vaults.get(this.name + "-review");
         else vault = Storage.vaults.get(this.name + "-main");
 
-        int items_added = 0;
+        int items_added = 0, item_size;
         for (ItemStack item : items) {
             if (item.getAmount() > this.getMax_stack_size()) item.setAmount(this.getMax_stack_size()); // enforce max stack size
+
+            item_size = item.toString().getBytes().length;
+            if (item_size > this.getMax_item_size()) { p.sendMessage("Item rejected from vault. too Large"); continue; }
+            if ( item_size < getMin_item_size()) { p.sendMessage("Item rejected from vault. too Small"); continue; }
+
             if (vault.addItem(new Item(item, p))) {
                 p.sendMessage("Item " + item.getItemMeta().getDisplayName() + " added to vault");
                 items_added++;
@@ -102,7 +107,7 @@ public class Archive {
         if (!this.ConfigFile.contains("submit-bans")) { addSubmit_ban("banned_player"); changed = true;}
         if (!this.ConfigFile.contains("placeholders") || ConfigFile.getSection("placeholders") == null) {
             ConfigFile.set("placeholders.example1", new Placeholder("example1").serialize());
-            ConfigFile.set("placeholders.example2", new Placeholder("example2", 6, "none", new ItemStack(Material.RED_CONCRETE, 1)).serialize());
+            ConfigFile.set("placeholders.example2", new Placeholder("example2", 6, "none",new Sound("null").serialize(), new ItemStack(Material.RED_CONCRETE, 1)).serialize());
             changed = true;
         }
         if (!ConfigFile.contains("gui") || ConfigFile.getSection("gui") == null) {
@@ -145,8 +150,8 @@ public class Archive {
     public boolean inf_pages() {return ConfigFile.getBoolean("inf-pages");}
     public boolean isAllow_submission() {return ConfigFile.getBoolean("allow-submissions");}
     public int getMax_stack_size() {return ConfigFile.getInt("max-stack-size");}
-    public int getMin_item_size() {return ConfigFile.getInt("max-submission-size");}
-    public int getMax_item_size() {return ConfigFile.getInt("min-submission-size");}
+    public int getMin_item_size() {return ConfigFile.getInt("min-submission-size");}
+    public int getMax_item_size() {return ConfigFile.getInt("max-submission-size");}
     public double getSubmit_delay() {return ConfigFile.getDouble("submit-delay");}
     public boolean getReview_items() { return ConfigFile.getBoolean("review-items"); }
 
@@ -163,6 +168,9 @@ public class Archive {
         List<String> list = ConfigFile.getStringList("editors");
         list.add(editor);
         ConfigFile.set("editors", list);
+    }
+    public boolean isEditor(String name) {
+        return ConfigFile.getStringList("editors").contains(name);
     }
     public void setSubmit_bans(List<String> submit_bans) { ConfigFile.set("submit-bans", submit_bans); }
     public void addSubmit_ban(String ban) {

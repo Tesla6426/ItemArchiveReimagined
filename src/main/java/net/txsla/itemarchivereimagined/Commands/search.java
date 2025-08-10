@@ -71,7 +71,7 @@ public class search implements CommandExecutor, TabExecutor {
                     items = vault.searchFromItemLanguage(parameter, 54);
                     break;
                 default:
-                    sender.sendMessage("Unknown search parameter.");
+                    sender.sendMessage("§cUnknown search parameter.");
                     break;
             }
             sender.sendMessage(items.size() + " items found!");
