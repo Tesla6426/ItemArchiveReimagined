@@ -5,6 +5,7 @@ import net.txsla.itemarchivereimagined.DataTypes.Item;
 import net.txsla.itemarchivereimagined.DataTypes.Placeholder;
 import net.txsla.itemarchivereimagined.DataTypes.Sound;
 import net.txsla.itemarchivereimagined.Gui.editArchive;
+import net.txsla.itemarchivereimagined.Gui.reviewItems;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -38,7 +39,7 @@ public final class ItemArchiveReimagined extends JavaPlugin {
 
         getCommand("count-items").setExecutor(new net.txsla.itemarchivereimagined.Commands.count() );
         getCommand("add-editor").setExecutor(new net.txsla.itemarchivereimagined.Commands.addEditor() );
-        //getCommand("review-items").setExecutor(new net.txsla.itemarchivereimagined.Commands.reviewItems() );
+        getCommand("review-items").setExecutor(new net.txsla.itemarchivereimagined.Commands.reviewItems() );
         getCommand("submit-ban").setExecutor(new net.txsla.itemarchivereimagined.Commands.submitBan() );
 
 
@@ -166,6 +167,22 @@ public final class ItemArchiveReimagined extends JavaPlugin {
         list.add("§9Make sure to save after making any changes");
         meta.setLore(list);
         editArchive.save_session.setItemMeta(meta);
+        list.clear();
+
+        reviewItems.fill = new ItemStack(Material.GLASS_PANE);
+        meta = reviewItems.fill.getItemMeta();
+        meta.setDisplayName(" ");
+        reviewItems.fill.setItemMeta(meta);
+        list.clear();
+
+        reviewItems.label = new ItemStack(Material.COMPARATOR);
+        meta = reviewItems.label.getItemMeta();
+        meta.setDisplayName("§7Review Page for Archive");
+        list.add("§fLeft click to approve items.");
+        list.add("§fRight click to reject items.");
+        list.add("§fShift/Middle click or use numkeys to grab/view item.");
+        meta.setLore(list);
+        reviewItems.label.setItemMeta(meta);
         list.clear();
     }
 }

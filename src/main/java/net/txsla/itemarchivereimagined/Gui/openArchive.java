@@ -22,8 +22,8 @@ public class openArchive {
 
         // get the starting index for the vault populators
         int vaultIndex = Storage.vaults.get(archive_name + "-main").getSize();
-        for (int i = 1; i < number; i++) vaultIndex -= archive.getPagePopulators(i); // off by one error
-
+        for (int i = 1; i < number; i++) vaultIndex -= archive.getPagePopulators(i);
+        vaultIndex--;// off by one error
         // Get page format
         Inventory inventory = loadInv.create(page.getSize(), page.getName().replaceAll("%page%", ""+number));
         String[] format = page.getFormat();

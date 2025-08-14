@@ -1,9 +1,8 @@
 package net.txsla.itemarchivereimagined;
 
-import net.txsla.itemarchivereimagined.DataTypes.Archive;
-import net.txsla.itemarchivereimagined.DataTypes.Page;
-import net.txsla.itemarchivereimagined.DataTypes.Placeholder;
+import net.txsla.itemarchivereimagined.DataTypes.*;
 import net.txsla.itemarchivereimagined.Gui.editArchive;
+import net.txsla.itemarchivereimagined.Gui.reviewItems;
 import org.bukkit.Sound;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
@@ -69,6 +68,7 @@ public class Listener implements org.bukkit.event.Listener {
         }
 
         // get gui
+        String clicked_UUID;
         switch (gui) {
             // these two are for when players open the archives
             case "submit":
@@ -109,7 +109,7 @@ public class Listener implements org.bukkit.event.Listener {
                 event.setCancelled(archiveClickEffect(p, action, action_data, archive_name, page));
                 break;
             case "edit":
-                String clicked_UUID = hash.getUUID(event.getCurrentItem());
+                clicked_UUID = hash.getUUID(event.getCurrentItem());
                 if (hash.getUUID(editArchive.null_slot).equals(clicked_UUID)) {event.setCancelled(true); return;}
                 if (hash.getUUID(editArchive.save_session).equals(clicked_UUID)) {event.setCancelled(true); editArchive.saveInventory(p.getName()); return;}
                 if (hash.getUUID(editArchive.reload_selection).equals(clicked_UUID)) {event.setCancelled(true); editArchive.reloadPlayerInventory(p.getName()); return;}
@@ -122,14 +122,52 @@ public class Listener implements org.bukkit.event.Listener {
                 break;
             case "review":
                 // this gui is for accepting or rejecting items
+                clicked_UUID = hash.getUUID(event.getCurrentItem());
+                if (hash.getUUID(reviewItems.fill).equals(clicked_UUID)) {event.setCancelled(true); return;}
+                if (hash.getUUID(reviewItems.label).equals(clicked_UUID)) {event.setCancelled(true); return;}
 
-                break;
+                // ignore shift and middle clicks
+                if (event.getClick().isShiftClick()) {return;}
+                // ignore click if it isn't a right or left click
+                if (!(event.getClick().isRightClick() || event.getClick().isLeftClick())) {return;}
+
+                Vault review = Storage.vaults.get(archive_name + "-review");
+                Vault main = Storage.vaults.get(archive_name + "-main");
+                Vault rejected = Storage.vaults.get(archive_name + "-rejected");
+
+                if (!review.checkDuplicate(clicked_UUID)) return; // this means item is not currently in the vault
+
+                Item item = review.searchFromItemUUID(clicked_UUID, 1).get(0); // get item with matching uuid
+
+                // add to either main or rejected
+                if (event.getClick().isLeftClick()) {
+                    main.addItem(item);
+                    p.sendMessage("§aItem " + item.getName() + "§a added to archive.");
+                    main.saveItemsToRam();
+                    main.saveRamToFile();
+                }
+                if (event.getClick().isRightClick()) {
+                    rejected.addItem(item);
+                    p.sendMessage("§cItem " + item.getName() + "§c rejected from archive.");
+                    rejected.saveItemsToRam();
+                    rejected.saveRamToFile();
+                }
+
+                // remove from review
+                review.removeItemByUUID(clicked_UUID, archive_name);
+                review.saveItemsToRam();
+                review.saveRamToFile();
+
+                // reload GUI
+                event.setCancelled(true);
+                p.closeInventory();
+                Storage.gui_tracker.put(p.getName(), archive_name + "¦review¦ignore¦0");
+                net.txsla.itemarchivereimagined.Gui.reviewItems.open(p, archive_name);
+                return;
         }
         if (action == 0) return;
-        if (action == 5) return; // this value should never be able to be clicked
+        if (action == 5) return;
         if (action == 1) {event.setCancelled(true); return;}
-
-
     }
     public static boolean archiveClickEffect(Player p, int action, String action_data, String archive_name, int page) {
         switch (action) {

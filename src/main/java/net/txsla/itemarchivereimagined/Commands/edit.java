@@ -210,6 +210,7 @@ public class edit implements CommandExecutor, TabExecutor {
                                 page.setName(String.join(" ", Arrays.copyOfRange(args, 5, args.length))); // spaces are valid here
                                 archive.setPage(val, page);
                                 archive.savePages();
+                                p.sendMessage("Page " + args[3] + "'s title has been set to " + page.getName() + ".");
                                 break;
                             case "size":
                                 try {
@@ -230,8 +231,14 @@ public class edit implements CommandExecutor, TabExecutor {
                                 // hand over control to editor session
                                 editArchive.startSession(p, archive.name(), val);
                                 return true;
+                            default:
+                                p.sendMessage("Invalid Argument.");
+                                return true;
                         }
                         break;
+                    default:
+                        p.sendMessage("Invalid Argument.");
+                        return true;
                 }
                 break;
             case "config":

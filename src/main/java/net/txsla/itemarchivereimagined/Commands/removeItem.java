@@ -1,17 +1,14 @@
 package net.txsla.itemarchivereimagined.Commands;
 
 import net.txsla.itemarchivereimagined.DataTypes.Archive;
-import net.txsla.itemarchivereimagined.DataTypes.Item;
 import net.txsla.itemarchivereimagined.DataTypes.Vault;
 import net.txsla.itemarchivereimagined.Storage;
 import net.txsla.itemarchivereimagined.hash;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,7 +41,7 @@ public class removeItem implements CommandExecutor, TabExecutor {
             case "item_in_hand":
                 if (uuid == null) uuid = hash.getUUID(p.getInventory().getItemInMainHand());
 
-                if (vault.removeItembyUUID(uuid)) {
+                if (vault.removeItemByUUID(uuid, archive.name())) {
                     p.sendMessage("Item " + uuid + " removed from archive.");
                     vault.saveItemsToRam();
                     vault.saveRamToFile();
@@ -60,7 +57,7 @@ public class removeItem implements CommandExecutor, TabExecutor {
                 if (!regex.matcher(args[2]).matches()) {sender.sendMessage("Invalid player name. " + args[2] + " does not match pattern '^\\w+$'"); return true;}
 
                 p.sendMessage("Removing " + args[2] + "'s items from the archive.");
-                int removed = vault.removeItemsBySubmitter(args[2]);
+                int removed = vault.removeItemsBySubmitter(args[2], archive.name());
                 p.sendMessage(removed + " items found and removed from archive.");
 
                 break;

@@ -1,7 +1,6 @@
 package net.txsla.itemarchivereimagined.DataTypes;
 
 import net.txsla.itemarchivereimagined.*;
-import org.bukkit.inventory.ItemStack;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -101,10 +100,11 @@ public class Vault {
     }
 
     // remove item by UUID
-    public boolean removeItembyUUID(String UUID) {
+    public boolean removeItemByUUID(String UUID, String archive_name) {
         if (!item_uuids.contains(UUID)) return false;
         for (int index = 0; index < items.size(); index++) {
             if (items.get(index).getUUID().equals(UUID)) {
+                Storage.vaults.get(archive_name+"-rejected").addItem( this.items.get(index) ); // add to rejected vault
                 items.remove(index);
                 item_uuids.remove(UUID);
                 return true;
@@ -112,14 +112,12 @@ public class Vault {
         }
         return false;
     }
-    public int removeItemsByUUID(List<String> UUID) {
+    public int removeItemsByUUID(List<String> UUID, String archive_name) {
         int counter = 0;
-        for (String uuid : UUID) {if (removeItembyUUID(uuid)) counter++;}
+        for (String uuid : UUID) {if (removeItemByUUID(uuid, archive_name)) counter++;}
         return counter;
     }
-    public int removeItemsBySubmitter(String submitter) {
-        int counter = 0;
-
+    public int removeItemsBySubmitter(String submitter, String archive_name) {
         // find all items from submitter
         List<Item> to_remove = searchFromSubmitterName("^"+submitter+"$", 999);
         if (to_remove.isEmpty()) return 0;
@@ -128,7 +126,7 @@ public class Vault {
         List<String> uuids = new ArrayList<>();
         for (Item item : to_remove) uuids.add(item.getUUID());
 
-        return removeItemsByUUID(uuids);
+        return removeItemsByUUID(uuids, archive_name);
     }
 
     // search features, these are slow, so make sure only supporters gain access

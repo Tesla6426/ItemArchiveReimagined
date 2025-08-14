@@ -18,6 +18,12 @@ permissions :
     default: true
 
 commands:
+  review-items:
+    description: "Review Items before they get added to the archive"
+    usage: "/review-items <archive>"
+    aliases: [ ]
+    permission: archive.editor
+    permission-message: "You do not have permission to use this command"
   submit-ban:
     description: "Bans a player from submitting items."
     usage: "/submit_ban <archive> <player>"
@@ -87,7 +93,7 @@ commands:
   open:
     description: "Open an archive"
     usage: "/open <archive> <int page>"
-    aliases: [ ]
+    aliases: [ 'open-archive']
     permission: archive.public
     permission-message: "You do not have permission to use this command"
   openDemoInventory:
