@@ -57,14 +57,24 @@ public class Archive {
             if (item.getAmount() > this.getMax_stack_size()) item.setAmount(this.getMax_stack_size()); // enforce max stack size
 
             item_size = item.toString().getBytes().length;
-            if (item_size > this.getMax_item_size()) { p.sendMessage("Item rejected from vault. too Large"); continue; }
-            if ( item_size < getMin_item_size()) { p.sendMessage("Item rejected from vault. too Small"); continue; }
+            if (item_size > this.getMax_item_size()) { p.sendMessage("Item rejected from vault: too Large"); continue; }
+            if ( item_size < getMin_item_size()) { p.sendMessage("Item rejected from vault: too Small"); continue; }
+
+            // check for duplicates across all three vaults
+            if (Storage.vaults.get(this.name + "-main").checkDuplicate(hash.getUUID(item)) ||
+                Storage.vaults.get(this.name + "-review").checkDuplicate(hash.getUUID(item)) ||
+                Storage.vaults.get(this.name + "-rejected").checkDuplicate(hash.getUUID(item))
+            ) {
+                p.sendMessage("Item " + item.getItemMeta().getDisplayName() + " rejected from vault: Duplicate");
+                continue;
+            }
+
 
             if (vault.addItem(new Item(item, p))) {
                 p.sendMessage("Item " + item.getItemMeta().getDisplayName() + " added to vault");
                 items_added++;
             }
-            else p.sendMessage("Item " + item.getItemMeta().getDisplayName() + " rejected from vault. isDuplicate?");
+            else p.sendMessage("Item " + item.getItemMeta().getDisplayName() + " rejected from vault: Unknown");
         }
 
         vault.saveItemsToRam();
