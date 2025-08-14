@@ -46,7 +46,7 @@ public class loadoldarchive implements CommandExecutor, TabExecutor {
                 try {
                     // decode item
                     data = encoded_item.split("¦");
-                    current_item = new Item(ItemConverter.toItemStack(b64.decode(data[5])), data[2]);
+                    current_item = new Item(ItemConverter.toItemStackOld(b64.decode(data[5])), data[2]);
 
                     // add to vault
                     if (vault.addItem(current_item)) {

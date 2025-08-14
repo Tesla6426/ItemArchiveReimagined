@@ -1,5 +1,6 @@
 package net.txsla.itemarchivereimagined;
 
+import net.txsla.itemarchivereimagined.Gui.editArchive;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -9,46 +10,36 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ItemConverter {
-    public static String toString(ItemStack savedItem) {
-        YamlConfiguration itemConfig = new YamlConfiguration();
-        itemConfig.set("item", savedItem);
-        String serialized = itemConfig.saveToString();
-        return serialized;
+    public static String toString(ItemStack saveItem) {
+        if (saveItem.isEmpty() || saveItem.getType().isAir()) {
+            System.out.println("Cannot serialize Air!");
+            return "null_item";
+        }
+
+        try {
+            byte[] nbt = saveItem.serializeAsBytes();                    // Paper API
+            return Base64.getEncoder().encodeToString(nbt);
+        } catch (Exception e) {
+            System.out.println("Error serializing item: \n" + e);
+            return "failed_to_serialize";
+        }
     }
     public static ItemStack toItemStack(String serialized) {
-        return  toItemStackPatched(serialized);
-        /*
-        ItemStack restoredItem;
-        YamlConfiguration restoreConfig = new YamlConfiguration();
         try {
-            restoreConfig.loadFromString(serialized);
-            restoredItem = restoreConfig.getItemStack("item");
+            byte[] nbt = Base64.getDecoder().decode(serialized);
+            return ItemStack.deserializeBytes(nbt);
         } catch (Exception e) {
-            ItemStack nullItem = new ItemStack(Material.RED_STAINED_GLASS_PANE, 1);
-            ItemMeta nullItemMeta = nullItem.getItemMeta();
-            //nullItemMeta.setMaxStackSize(1);
-            nullItemMeta.setDisplayName(ChatColor.RED + "Loading Item...");
-            nullItem.setItemMeta(nullItemMeta);
-            return nullItem;
+            return Storage.red_glass.getItemStack();
         }
-
-        if (restoredItem.getType().toString().equals(Material.AIR.toString())) {
-            //System.out.println("serialized to AIR\n" + serialized);
-        }
-
-        return restoredItem;
-
-         */
     }
-
-
-    public static ItemStack toItemStackPatched(String serialized) {
+    public static ItemStack toItemStackOld(String serialized) {
         try {
             // Step 1: Load raw YAML into Map using SnakeYAML
             Yaml yaml = new Yaml();
