@@ -10,12 +10,12 @@ permissions :
     default: true
   archive.tester:
     description: "Allows the player to access debug features"
-    default-permission: true
-    default: true
+    default-permission: false
+    default: false
   archive.editor:
     description: "Allows the player to edit archives that they have been added to"
-    default-permission: true
-    default: true
+    default-permission: false
+    default: false
 
 commands:
   review-items:

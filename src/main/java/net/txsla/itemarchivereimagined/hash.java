@@ -32,14 +32,22 @@ public class hash {
         // add item name and type, then hash
         if (item == null) item = new ItemStack(Material.AIR);
 
-        // handle null name
-
-        // I need to make this have less overlap
 
         ItemMeta meta = item.getItemMeta(); String name;
         if (meta == null) name = "null-" + item.getType();
             else name = meta.getDisplayName();
 
-        return sha256(name + item.getType());
+            // get lore to 255 chars
+        String lore = (meta != null && meta.hasLore())  ? truncateByCodePoints(String.join("\n", meta.getLore()), 511)  : "no lore";
+
+        return sha256(name + item.getType() + lore);
+    }
+    static String truncateByCodePoints(String s, int max) {
+        if (s == null) return "";
+        if (s.length() <= max) return s;
+        int cps = s.codePointCount(0, s.length());
+        if (cps <= max) return s;
+        int end = s.offsetByCodePoints(0, max);
+        return s.substring(0, end);
     }
 }

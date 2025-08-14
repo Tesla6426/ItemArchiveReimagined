@@ -66,7 +66,8 @@ public class Item {
         if (this.item_stack.getItemMeta() != null) {
             this.item_uuid = hash.getUUID(this.item_stack);
         } else {
-            //System.out.println("No Metadata on item " + item.toString() + "?");
+            System.out.println("No Metadata on item " + item.toString() + "?");
+            this.item_uuid = "???";
         }
 
         this.item_language = "null";
@@ -94,7 +95,7 @@ public class Item {
         return item_name;
     }
     public String getUUID() {
-        return this.item_uuid;
+        return this.item_uuid != null ? this.item_uuid : hash.getUUID(this.item_stack);
     }
     public String getSubmitterName() {
         return this.submitter_name;

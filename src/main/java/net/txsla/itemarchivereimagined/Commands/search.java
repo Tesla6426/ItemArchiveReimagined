@@ -28,12 +28,10 @@ public class search implements CommandExecutor, TabExecutor {
 
 
         // make sure the vault exists
-        if (Storage.vaults.containsKey(args[0])) {
-            sender.sendMessage("§cArchive " + args[0] + " does not exist"); //return true;
-        }
+        if (!Storage.archives.containsKey(args[0])) { sender.sendMessage("§cArchive " + args[0] + " does not exist"); return true; }
 
         // some variables
-        Vault vault = Storage.vaults.get(args[0]);
+        Vault vault = Storage.vaults.get(args[0] + "-main");
         String parameter = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
         Inventory chestInventory = Bukkit.createInventory(null, 54, "Searching " + args[0] + ". " + args[1] + " : " + parameter);
 
@@ -95,7 +93,7 @@ public class search implements CommandExecutor, TabExecutor {
 
         switch (args.length) {
             case 1:
-                list = new ArrayList<>(Storage.vaults.keySet());
+                list = new ArrayList<>(Storage.archives.keySet());
                 break;
             case 2:
                 list.add("item_name");
