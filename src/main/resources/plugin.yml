@@ -1,7 +1,7 @@
 name: ItemArchiveReimagined
 version: '${project.version}'
 main: net.txsla.itemarchivereimagined.ItemArchiveReimagined
-api-version: '1.20'
+api-version: '1.21'
 
 permissions :
   archive.public:
@@ -10,12 +10,12 @@ permissions :
     default: true
   archive.tester:
     description: "Allows the player to access debug features"
-    default-permission: false
-    default: op
+    default-permission: true
+    default: true
   archive.editor:
     description: "Allows the player to edit archives that they have been added to"
-    default-permission: false
-    default: op
+    default-permission: true
+    default: true
 
 commands:
   review-items:

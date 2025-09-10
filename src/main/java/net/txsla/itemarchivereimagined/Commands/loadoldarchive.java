@@ -27,7 +27,7 @@ import java.util.List;
 
 public class loadoldarchive implements CommandExecutor, TabExecutor {
     // open a vault directly bypassing the archive interface
-    public static Path old = new File("C:\\Users\\txsla\\Desktop\\archves\\old\\ARCHIVE.ar").toPath();
+    public static Path old = new File("C:\\Users\\txsla\\Desktop\\archves\\new\\ARCHIVE.ar").toPath();
     public static List<String> old_file;
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args)
